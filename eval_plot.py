@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def eval(model, dl, device):
-    total_error = 0
+    cum_score = 0
     total = 0
     
     with torch.no_grad():
@@ -12,13 +12,13 @@ def eval(model, dl, device):
             seq, trg = seq.to(device), trg.to(device)
             seq_mask = torch.ones_like(seq)
             out = model(seq, seq_mask)
-            out = out.squeeze(-1)
-            trg = trg.squeeze(-1)
-            mape = torch.sum(torch.abs((out - trg)))
-            total_error += mape
-            total += out.size(0)
+            # out = out.squeeze(-1)
+            # trg = trg.squeeze(-1)
+            mae = torch.mean(torch.abs((out - trg)))
+            cum_score += mae
+            total += 1
     
-    return total_error / total
+    return cum_score / total
 
 
 def plot_scores(train_maes, test_maes):

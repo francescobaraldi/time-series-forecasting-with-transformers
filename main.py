@@ -41,7 +41,7 @@ data = torch.from_numpy(data).to(torch.float32)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
 learning_rate = 0.01
-epochs = 50
+epochs = 10
 window_len = 7
 output_len = 1
 trainset = data[0:int(len(data) * 0.7)]
@@ -51,7 +51,7 @@ test_dataset = StockDatasetSW(testset, window_len, output_len)
 train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 model = Transformer(seq_len=window_len, num_encoder=6, input_size=1, embed_dim=512, num_heads=1, feedforward_dim=1024).to(device)
-loss_fun = nn.MSELoss()
+loss_fun = nn.L1Loss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 train_maes = []
