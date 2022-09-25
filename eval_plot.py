@@ -15,7 +15,7 @@ def eval(model, dl, device):
             out = out.squeeze(-1)
             trg = trg.squeeze(-1)
             mape = torch.sum(torch.abs((out - trg)))
-            total_error += mape.item()
+            total_error += mape
             total += out.size(0)
     
     return total_error / total
