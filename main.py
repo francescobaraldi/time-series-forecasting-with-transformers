@@ -71,7 +71,7 @@ for e in tqdm(range(epochs)):
     for i, (seq, trg) in enumerate(train_dl):
         seq, trg = seq.to(device), trg.to(device)
         optimizer.zero_grad()
-        seq_mask = torch.ones_like(seq)
+        seq_mask = torch.triu(torch.ones(window_len, window_len) * float('-inf'), diagonal=1)
         out = model(seq, seq_mask)
         loss = loss_fun(out, trg)
         if i % 50 == 0:

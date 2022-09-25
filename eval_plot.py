@@ -10,10 +10,8 @@ def eval(model, dl, device):
     with torch.no_grad():
         for seq, trg in dl:
             seq, trg = seq.to(device), trg.to(device)
-            seq_mask = torch.ones_like(seq)
+            seq_mask = torch.triu(torch.ones(seq.shape[1], seq.shape[1]) * float('-inf'), diagonal=1)
             out = model(seq, seq_mask)
-            # out = out.squeeze(-1)
-            # trg = trg.squeeze(-1)
             mae = torch.mean(torch.abs((out - trg)))
             cum_score += mae
             total += 1
