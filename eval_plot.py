@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 
@@ -11,7 +12,10 @@ def eval(model, dl, device):
             seq, trg = seq.to(device), trg.to(device)
             seq_mask = torch.ones_like(seq)
             out = model(seq, seq_mask)
-            total_error += torch.sum(torch.abs(out - trg))
+            out = out.squeeze(-1)
+            trg = trg.squeeze(-1)
+            mape = torch.sum(torch.abs((out - trg)))
+            total_error += mape.item()
             total += out.size(0)
     
     return total_error / total
