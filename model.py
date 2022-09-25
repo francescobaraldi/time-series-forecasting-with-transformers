@@ -1,13 +1,15 @@
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 
 
-def eval(model, dl):
+def eval(model, dl, device):
     total_error = 0
     total = 0
     
     with torch.no_grad():
-        for seq, trg in dl:
+        for seq, trg in tqdm(dl):
+            seq, trg = seq.to(device), trg.to(device)
             seq_mask = torch.ones_like(seq)
             out = model(seq, seq_mask)
             total_error += torch.sum(torch.abs(out - trg))

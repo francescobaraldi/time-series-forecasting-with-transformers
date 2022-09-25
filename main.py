@@ -19,8 +19,9 @@ from model import Transformer, eval, DotProductAttention
 # values = torch.rand((32, 7, 1024))
 # out = model(queries, keys, values)
 
+dataset_path = "datasets/spx.csv"
 
-sp500 = pd.read_csv("datasets/spx.csv")
+sp500 = pd.read_csv(dataset_path)
 sp500.head()
 # plt.plot(sp500['close'])
 # plt.show()
@@ -36,6 +37,7 @@ sp500.head()
 data = sp500['close'].to_numpy()
 data = torch.from_numpy(data).to(torch.float32)
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
 learning_rate = 0.01
 epochs = 10
@@ -47,25 +49,26 @@ train_dataset = StockDatasetSW(trainset, window_len, output_len)
 test_dataset = StockDatasetSW(testset, window_len, output_len)
 train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-model = Transformer(seq_len=window_len, num_encoder=6, input_size=1, embed_dim=512, num_heads=1, feedforward_dim=1024)
+model = Transformer(seq_len=window_len, num_encoder=6, input_size=1, embed_dim=512, num_heads=1, feedforward_dim=1024).to(device)
 loss_fun = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-for e in range(epochs):
+for e in tqdm(range(epochs)):
     model.eval()
     
-    train_mae = eval(model, train_dl)
-    test_mae = eval(model, test_dl)
+    train_mae = eval(model, train_dl, device)
+    test_mae = eval(model, test_dl, device)
     
     print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
     
     model.train()
-    for seq, trg in tqdm(train_dl):
+    for i, (seq, trg) in enumerate(train_dl):
+        seq, trg = seq.to(device), trg.to(device)
         optimizer.zero_grad()
         seq_mask = torch.ones_like(seq)
         out = model(seq, seq_mask)
         loss = loss_fun(out, trg)
-        
+        if i % 10 == 0:
+            print(f'loss {loss.cpu().item():.3f}')
         loss.backward()
         optimizer.step()
-
