@@ -10,7 +10,8 @@ import matplotlib.dates as mdates
 from tqdm import tqdm
 
 from dataset import StockDatasetSW
-from model import Transformer, eval, DotProductAttention
+from model import Transformer, DotProductAttention
+from eval_plot import eval, plot_scores
 
 # d = 1
 # model = DotProductAttention()
@@ -61,8 +62,8 @@ for e in tqdm(range(epochs)):
     
     train_mae = eval(model, train_dl, device)
     test_mae = eval(model, test_dl, device)
-    train_maes.append(train_mae)
-    test_maes.append(test_mae)
+    train_maes.append(train_mae.cpu())
+    test_maes.append(test_mae.cpu())
     
     print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
     
@@ -77,3 +78,5 @@ for e in tqdm(range(epochs)):
             print(f'loss {loss.cpu().item():.3f}')
         loss.backward()
         optimizer.step()
+
+plot_scores(train_maes, test_maes)
