@@ -1,2 +1,3 @@
-# time-series-forecasting-with-transformers
-Project developed for the School in AI course
+# Financial time series forecasting with transformers
+Project developed for the School in AI course. The goal of the prohect is predict the stock evolution using transformers.
+Still under development...
