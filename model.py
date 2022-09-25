@@ -2,22 +2,6 @@ import torch
 import torch.nn as nn
 
 
-def eval(model, dl, device):
-    total_error = 0
-    total = 0
-    
-    with torch.no_grad():
-        for seq, trg in dl:
-            seq, trg = seq.to(device), trg.to(device)
-            seq_mask = torch.ones_like(seq)
-            out = model(seq, seq_mask)
-            total_error += torch.sum(torch.abs(out - trg))
-            total += out.size(0)
-    
-    return total_error / total
-            
-
-
 class Transformer(nn.Module):
     def __init__(self, seq_len, num_encoder, input_size, embed_dim, num_heads, feedforward_dim):
         super(Transformer, self).__init__()
