@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from tqdm import tqdm
 
 
 def eval(model, dl, device):
@@ -8,7 +7,7 @@ def eval(model, dl, device):
     total = 0
     
     with torch.no_grad():
-        for seq, trg in tqdm(dl):
+        for seq, trg in dl:
             seq, trg = seq.to(device), trg.to(device)
             seq_mask = torch.ones_like(seq)
             out = model(seq, seq_mask)

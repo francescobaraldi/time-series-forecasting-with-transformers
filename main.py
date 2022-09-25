@@ -40,7 +40,7 @@ data = torch.from_numpy(data).to(torch.float32)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
 learning_rate = 0.01
-epochs = 10
+epochs = 50
 window_len = 7
 output_len = 1
 trainset = data[0:int(len(data) * 0.7)]
@@ -53,11 +53,16 @@ model = Transformer(seq_len=window_len, num_encoder=6, input_size=1, embed_dim=5
 loss_fun = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
+train_maes = []
+test_maes = []
+
 for e in tqdm(range(epochs)):
     model.eval()
     
     train_mae = eval(model, train_dl, device)
     test_mae = eval(model, test_dl, device)
+    train_maes.append(train_mae)
+    test_maes.append(test_mae)
     
     print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
     
@@ -68,7 +73,7 @@ for e in tqdm(range(epochs)):
         seq_mask = torch.ones_like(seq)
         out = model(seq, seq_mask)
         loss = loss_fun(out, trg)
-        if i % 10 == 0:
+        if i % 50 == 0:
             print(f'loss {loss.cpu().item():.3f}')
         loss.backward()
         optimizer.step()
