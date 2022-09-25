@@ -8,7 +8,7 @@ class Transformer(nn.Module):
         self.linear1 = nn.Linear(input_size, embed_dim)
         encode_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_encoder)
-        # self.positional = nn.parameter.Parameter(torch.zeros(seq_len))
+        # self.positional = nn.parameter.Parameter(torch.rand(seq_len))
         self.linear2 = nn.Linear(embed_dim, input_size)
         self.seq_len = seq_len
         
@@ -16,7 +16,7 @@ class Transformer(nn.Module):
         assert(seq.shape[1] == seq_mask.shape[1] == self.seq_len)
         # pos = self.positional + seq
         seq_mapped = self.linear1(seq)
-        out = self.encoder(seq_mapped)
+        out = self.encoder(seq_mapped, seq_mask)
         out = self.linear2(out)
         return out
            
