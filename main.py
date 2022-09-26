@@ -9,9 +9,10 @@ import datetime
 import matplotlib.dates as mdates
 from tqdm import tqdm
 
-from dataset import StockDatasetSW
-from model import Transformer, DotProductAttention
-from eval_plot import eval_mae, plot_scores
+from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep
+from model import Transformer, TransformerDecoder, DotProductAttention
+from eval_plot import eval_mae, eval_mae_decoder, plot_scores
+
 
 # d = 1
 # model = DotProductAttention()
@@ -38,44 +39,92 @@ sp500.head()
 data = sp500['close'].to_numpy()
 data = torch.from_numpy(data).to(torch.float32)
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-batch_size = 32
-learning_rate = 0.01
-epochs = 10
-window_len = 7
-output_len = 3
-trainset = data[0:int(len(data) * 0.7)]
-testset = data[int(len(data) * 0.7):]
-train_dataset = StockDatasetSW(trainset, window_len, output_len)
-test_dataset = StockDatasetSW(testset, window_len, output_len)
-train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-model = Transformer(seq_len=window_len, num_encoder=6, num_decoder=6, input_size=1, output_size=output_len, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
-loss_fun = nn.L1Loss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+decoder = True
 
-train_maes = []
-test_maes = []
+if not decoder:
 
-for e in tqdm(range(epochs)):
-    model.eval()
-    
-    train_mae = eval_mae(model, train_dl, device)
-    test_mae = eval_mae(model, test_dl, device)
-    train_maes.append(train_mae.cpu())
-    test_maes.append(test_mae.cpu())
-    
-    print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
-    
-    model.train()
-    for i, (src, trg, trg_y) in enumerate(train_dl):
-        src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
-        optimizer.zero_grad()
-        out = model(src, trg)
-        loss = loss_fun(out, trg_y)
-        if i % 50 == 0:
-            print(f'loss {loss.cpu().item():.3f}')
-        loss.backward()
-        optimizer.step()
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    batch_size = 32
+    learning_rate = 0.01
+    epochs = 10
+    window_len = 7
+    output_len = 3
+    trainset = data[0:int(len(data) * 0.7)]
+    testset = data[int(len(data) * 0.7):]
+    train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
+    test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
+    train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    model = Transformer(seq_len=window_len, num_encoder=6, num_decoder=6, input_size=1, output_size=output_len, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
+    loss_fun = nn.L1Loss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-plot_scores(train_maes, test_maes)
+    train_maes = []
+    test_maes = []
+
+    for e in tqdm(range(epochs)):
+        model.eval()
+
+        train_mae = eval_mae(model, train_dl, device)
+        test_mae = eval_mae(model, test_dl, device)
+        train_maes.append(train_mae.cpu())
+        test_maes.append(test_mae.cpu())
+
+        print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
+
+        model.train()
+        for i, (src, trg, trg_y) in enumerate(train_dl):
+            src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
+            optimizer.zero_grad()
+            out = model(src, trg)
+            loss = loss_fun(out, trg_y)
+            if i % 50 == 0:
+                print(f'loss {loss.cpu().item():.3f}')
+            loss.backward()
+            optimizer.step()
+
+    plot_scores(train_maes, test_maes)
+
+else:
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    batch_size = 32
+    learning_rate = 0.01
+    epochs = 10
+    window_len = 7
+    output_len = 3
+    trainset = data[0:int(len(data) * 0.7)]
+    testset = data[int(len(data) * 0.7):]
+    train_dataset = StockDatasetSW_singlestep(trainset, window_len)
+    test_dataset = StockDatasetSW_singlestep(testset, window_len)
+    train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    model = TransformerDecoder(seq_len=window_len, num_layer=6, input_size=1, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
+    loss_fun = nn.L1Loss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    train_maes = []
+    test_maes = []
+
+    for e in tqdm(range(epochs)):
+        model.eval()
+
+        train_mae = eval_mae_decoder(model, train_dl, device)
+        test_mae = eval_mae_decoder(model, test_dl, device)
+        train_maes.append(train_mae.cpu())
+        test_maes.append(test_mae.cpu())
+
+        print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
+
+        model.train()
+        for i, (src, trg) in enumerate(train_dl):
+            src, trg = src.to(device), trg.to(device)
+            optimizer.zero_grad()
+            out = model(src)
+            loss = loss_fun(out, trg)
+            if i % 50 == 0:
+                print(f'loss {loss.cpu().item():.3f}')
+            loss.backward()
+            optimizer.step()
+
+    plot_scores(train_maes, test_maes)
