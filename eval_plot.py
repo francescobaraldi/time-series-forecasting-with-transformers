@@ -12,7 +12,7 @@ def eval(model, dl, device):
             model = model.to(device)
             seq, trg = seq.to(device), trg.to(device)
             seq_mask = torch.triu(torch.ones(seq.shape[1], seq.shape[1]) * float('-inf'), diagonal=1).to(device)
-            out = model(seq, seq_mask)
+            out = model(seq)
             mae = torch.mean(torch.abs((out - trg)))
             cum_score += mae
             total += 1
