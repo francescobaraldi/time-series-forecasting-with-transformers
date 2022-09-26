@@ -12,13 +12,17 @@ class Transformer(nn.Module):
         self.linear2 = nn.Linear(embed_dim, input_size)
         self.seq_len = seq_len
         
-    def forward(self, seq, seq_mask):
+    def forward(self, seq):
+        seq_mask = self.generate_mask(seq.shape[1])
         assert(seq.shape[1] == seq_mask.shape[1] == self.seq_len)
         seq_mapped = self.linear1(seq)
         pos = self.positional + seq_mapped
         out = self.encoder(pos, seq_mask)
         out = self.linear2(out)
         return out
+    
+    def generate_mask(self, seq_len):
+        return torch.triu(torch.ones(seq_len, seq_len) * float('-inf'), diagonal=1)
            
 
 class DotProductAttention(nn.Module):
