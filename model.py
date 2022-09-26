@@ -69,9 +69,9 @@ class Transformer(nn.Module):
         trg = self.decode_input_layer(trg)
         
         if src_mask is None:
-            src_mask = self.generate_mask(self.output_size, self.seq_len)
+            src_mask = self.generate_mask(self.output_size, self.seq_len).to(src.device)
         if trg_mask is None:
-            trg_mask = self.generate_mask(self.output_size, self.output_size)
+            trg_mask = self.generate_mask(self.output_size, self.output_size).to(src.device)
         
         decoder_output = self.decoder(tgt=trg, memory=encoder_output, tgt_mask=trg_mask, memory_mask=src_mask)
         
