@@ -10,7 +10,7 @@ import matplotlib.dates as mdates
 from tqdm import tqdm
 
 from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep
-from model import Transformer, TransformerDecoder, DotProductAttention
+from model import Transformer, TransformerDecoder, TransformerDecoder_v2, DotProductAttention
 from eval_plot import eval_mae, eval_mae_decoder, plot_scores
 
 
@@ -99,7 +99,7 @@ else:
     test_dataset = StockDatasetSW_singlestep(testset, window_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    model = TransformerDecoder(seq_len=window_len, num_layer=6, input_size=1, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
+    model = TransformerDecoder_v2(seq_len=window_len, num_layer=6, input_size=1, d_model=8, num_heads=8, feedforward_dim=1024).to(device)
     loss_fun = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 

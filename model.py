@@ -112,6 +112,31 @@ class TransformerDecoder(nn.Module):
         return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
 
+class TransformerDecoder_v2(nn.Module):
+    def __init__(self, seq_len, num_layer, input_size, d_model, num_heads, feedforward_dim):
+        super(TransformerDecoder_v2, self).__init__()
+        self.seq_len = seq_len
+        self.input_size = input_size
+        self.d_model = d_model
+        self.positional = PositionalEncoder(d_model=d_model)
+        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
+        self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
+        
+    def forward(self, src, src_mask=None):
+        src_pos = self.positional(src)
+        
+        if src_mask is None:
+            src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
+        
+        encoder_output = self.encoder(src_pos, src_mask)
+        
+        return encoder_output
+        
+    
+    def generate_mask(self, dim1, dim2):
+        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
+
+
 class DotProductAttention(nn.Module):
     def __init__(self):
         super(DotProductAttention, self).__init__()
