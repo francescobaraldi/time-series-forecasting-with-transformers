@@ -44,7 +44,7 @@ data = torch.from_numpy(data).to(torch.float32)
 trainset = data[0:int(len(data) * 0.7)]
 testset = data[int(len(data) * 0.7):]
 
-trainset, testset = scaler(trainset, testset)
+trainset_scaled, testset_scaled = scaler(trainset, testset)
 
 decoder = True
 
@@ -56,8 +56,8 @@ if not decoder:
     epochs = 10
     window_len = 7
     output_len = 3
-    train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
-    test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
+    train_dataset = StockDatasetSW_multistep(trainset_scaled, window_len, output_len)
+    test_dataset = StockDatasetSW_multistep(testset_scaled, window_len, output_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     model = Transformer(seq_len=window_len, num_encoder=6, num_decoder=6, input_size=1, output_size=output_len, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
@@ -97,17 +97,17 @@ else:
     learning_rate = 0.01
     epochs = 10
     window_len = 7
-    output_len = 3
-    train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
-    test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
+    train_dataset = StockDatasetSW_singlestep(trainset, window_len)
+    test_dataset = StockDatasetSW_singlestep(testset, window_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    model = TransformerDecoder_v2(seq_len=window_len, num_layer=6, input_size=1, d_model=8, num_heads=8, feedforward_dim=1024).to(device)
+    model = TransformerDecoder(seq_len=window_len, num_layer=1, input_size=1, d_model=1, num_heads=1, feedforward_dim=32).to(device)
     loss_fun = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     train_maes = []
     test_maes = []
+    losses = []
 
     for e in tqdm(range(epochs)):
         model.eval()
@@ -120,14 +120,20 @@ else:
         print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
 
         model.train()
+        avg_loss = 0
+        count = 0
         for i, (src, trg) in enumerate(train_dl):
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)
             loss = loss_fun(out, trg)
+            avg_loss += loss.cpu().detach().numpy().item()
             if i % 50 == 0:
                 print(f'loss {loss.cpu().item():.3f}')
             loss.backward()
             optimizer.step()
+            count += 1
+        avg_loss /= count
+        losses.append(avg_loss)
 
-    plot_scores(train_maes, test_maes)
+    plot_scores(train_maes, test_maes, losses)

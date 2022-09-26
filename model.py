@@ -1,48 +1,6 @@
 import torch
 import torch.nn as nn
-import math
-
-
-class PositionalEncoder(nn.Module):
-    def __init__(self, dropout: float=0.1, max_seq_len: int=5000, d_model: int=512, batch_first: bool=True):
-        super(PositionalEncoder, self).__init__()
-        self.d_model = d_model
-        self.dropout = nn.Dropout(p=dropout)
-
-        self.batch_first = batch_first
-
-        # adapted from PyTorch tutorial
-        position = torch.arange(max_seq_len).unsqueeze(1)
-        
-        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
-        
-        if self.batch_first:
-            pe = torch.zeros(1, max_seq_len, d_model)
-            
-            pe[0, :, 0::2] = torch.sin(position * div_term)
-            
-            pe[0, :, 1::2] = torch.cos(position * div_term)
-        else:
-            pe = torch.zeros(max_seq_len, 1, d_model)
-        
-            pe[:, 0, 0::2] = torch.sin(position * div_term)
-        
-            pe[:, 0, 1::2] = torch.cos(position * div_term)
-        
-        self.register_buffer('pe', pe)
-        
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            x: Tensor, shape [batch_size, enc_seq_len, dim_val] or 
-               [enc_seq_len, batch_size, dim_val]
-        """
-        if self.batch_first:
-            x = x + self.pe[:,:x.size(1)]
-        else:
-            x = x + self.pe[:x.size(0)]
-
-        return self.dropout(x)
+from positional_encoding import PositionalEncoderStd, Time2Vec
 
 
 class Transformer(nn.Module):
@@ -51,7 +9,7 @@ class Transformer(nn.Module):
         self.seq_len = seq_len
         self.input_size = input_size
         self.output_size = output_size
-        self.positional = PositionalEncoder(d_model=d_model)
+        self.positional = PositionalEncoderStd(d_model=d_model)
         self.encode_input_layer = nn.Linear(input_size, d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_encoder)
@@ -89,7 +47,7 @@ class TransformerDecoder(nn.Module):
         super(TransformerDecoder, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
-        self.positional = PositionalEncoder(d_model=d_model)
+        self.positional = Time2Vec(input_size, d_model)
         self.encode_input_layer = nn.Linear(input_size, d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
@@ -118,7 +76,7 @@ class TransformerDecoder_v2(nn.Module):
         self.seq_len = seq_len
         self.input_size = input_size
         self.d_model = d_model
-        self.positional = PositionalEncoder(d_model=d_model)
+        self.positional = PositionalEncoderStd(d_model=d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
         

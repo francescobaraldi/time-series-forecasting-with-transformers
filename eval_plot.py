@@ -35,14 +35,20 @@ def eval_mae_decoder(model, dl, device):
     return cum_score / total
 
 
-def plot_scores(train_maes, test_maes):
+def plot_scores(train_maes, test_maes, losses):
     legend = ['Train', 'Test']
     xlabel = 'Epoch'
     n_epochs = len(train_maes)
 
     plt.figure(figsize=(20, 6))
-
+    
     plt.subplot(1, 2, 1)
+    plt.plot(range(1, n_epochs + 1), losses, 'r')
+    plt.title('Loss')
+    plt.xlabel(xlabel)
+    plt.ylabel('Loss')
+
+    plt.subplot(1, 2, 2)
     plt.plot(range(1, n_epochs + 1), train_maes, 'g', \
         range(1, n_epochs + 1), test_maes, 'b')
     plt.title('MAE')
