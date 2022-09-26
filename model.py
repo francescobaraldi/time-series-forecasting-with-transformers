@@ -98,11 +98,11 @@ class TransformerDecoder(nn.Module):
     def forward(self, src, src_mask=None):
         src = self.encode_input_layer(src)
         src_pos = self.positional(src)
-        encoder_output = self.encoder(src_pos)
         
         if src_mask is None:
             src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
         
+        encoder_output = self.encoder(src_pos, src_mask)
         output = self.output_layer(encoder_output)
         
         return output
