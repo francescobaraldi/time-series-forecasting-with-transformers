@@ -3,17 +3,16 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 
-def eval(model, dl, device):
+def eval_mae(model, dl, device):
     cum_score = 0
     total = 0
     
     with torch.no_grad():
-        for seq, trg in dl:
+        for src, trg, trg_y in dl:
             model = model.to(device)
-            seq, trg = seq.to(device), trg.to(device)
-            seq_mask = torch.triu(torch.ones(seq.shape[1], seq.shape[1]) * float('-inf'), diagonal=1).to(device)
-            out = model(seq)
-            mae = torch.mean(torch.abs((out - trg)))
+            src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
+            out = model(src, trg)
+            mae = torch.mean(torch.abs((out - trg_y)))
             cum_score += mae
             total += 1
     

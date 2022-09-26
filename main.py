@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from dataset import StockDatasetSW
 from model import Transformer, DotProductAttention
-from eval_plot import eval, plot_scores
+from eval_plot import eval_mae, plot_scores
 
 # d = 1
 # model = DotProductAttention()
@@ -43,14 +43,14 @@ batch_size = 32
 learning_rate = 0.01
 epochs = 10
 window_len = 7
-output_len = 1
+output_len = 3
 trainset = data[0:int(len(data) * 0.7)]
 testset = data[int(len(data) * 0.7):]
 train_dataset = StockDatasetSW(trainset, window_len, output_len)
 test_dataset = StockDatasetSW(testset, window_len, output_len)
 train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-model = Transformer(seq_len=window_len, num_encoder=6, input_size=1, embed_dim=512, num_heads=1, feedforward_dim=1024).to(device)
+model = Transformer(seq_len=window_len, num_encoder=6, num_decoder=6, input_size=1, output_size=output_len, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
 loss_fun = nn.L1Loss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -60,20 +60,19 @@ test_maes = []
 for e in tqdm(range(epochs)):
     model.eval()
     
-    train_mae = eval(model, train_dl, device)
-    test_mae = eval(model, test_dl, device)
+    train_mae = eval_mae(model, train_dl, device)
+    test_mae = eval_mae(model, test_dl, device)
     train_maes.append(train_mae.cpu())
     test_maes.append(test_mae.cpu())
     
     print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
     
     model.train()
-    for i, (seq, trg) in enumerate(train_dl):
-        seq, trg = seq.to(device), trg.to(device)
+    for i, (src, trg, trg_y) in enumerate(train_dl):
+        src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
         optimizer.zero_grad()
-        seq_mask = torch.triu(torch.ones(window_len, window_len) * float('-inf'), diagonal=1).to(device)
-        out = model(seq, seq_mask)
-        loss = loss_fun(out, trg)
+        out = model(src, trg)
+        loss = loss_fun(out, trg_y)
         if i % 50 == 0:
             print(f'loss {loss.cpu().item():.3f}')
         loss.backward()
