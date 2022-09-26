@@ -12,6 +12,7 @@ from tqdm import tqdm
 from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, DotProductAttention
 from eval_plot import eval_mae, eval_mae_decoder, plot_scores
+from utils import scaler
 
 
 # d = 1
@@ -36,8 +37,14 @@ sp500.head()
 # plt.gcf().autofmt_xdate()
 # plt.show()
 
+
 data = sp500['close'].to_numpy()
 data = torch.from_numpy(data).to(torch.float32)
+
+trainset = data[0:int(len(data) * 0.7)]
+testset = data[int(len(data) * 0.7):]
+
+trainset, testset = scaler(trainset, testset)
 
 decoder = True
 
@@ -49,8 +56,6 @@ if not decoder:
     epochs = 10
     window_len = 7
     output_len = 3
-    trainset = data[0:int(len(data) * 0.7)]
-    testset = data[int(len(data) * 0.7):]
     train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
     test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
@@ -93,10 +98,8 @@ else:
     epochs = 10
     window_len = 7
     output_len = 3
-    trainset = data[0:int(len(data) * 0.7)]
-    testset = data[int(len(data) * 0.7):]
-    train_dataset = StockDatasetSW_singlestep(trainset, window_len)
-    test_dataset = StockDatasetSW_singlestep(testset, window_len)
+    train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
+    test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     model = TransformerDecoder_v2(seq_len=window_len, num_layer=6, input_size=1, d_model=8, num_heads=8, feedforward_dim=1024).to(device)
