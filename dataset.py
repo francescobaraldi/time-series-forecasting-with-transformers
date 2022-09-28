@@ -1,51 +1,94 @@
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 import torch
 from torch.utils.data import Dataset
 
 
-class StockDatasetSW_multistep(Dataset):
-    def __init__(self, data, window_len, output_len):
-        self.data = data
+class SP500Dataset(Dataset):
+    def prepare_dataset(self, dataset_path):
+        dataset = pd.read_csv(dataset_path)
+        dataset = dataset[['close']]
+        return dataset
+    
+    def split_dataset(self, dataset, train, train_rate):
+        n = len(dataset)
+        if train:
+            return dataset[:int(n * train_rate)]
+        else:
+            return dataset[int(n * (1 - train_rate)):]
+    
+    def __init__(self, dataset_path, window_len, train=True, train_rate=0.7, scaler=None):
+        super().__init__()
+        dataset = self.prepare_dataset(dataset_path)
+        self.dataset = self.split_dataset(dataset, train, train_rate).to_numpy()
         self.window_len = window_len
-        self.output_len = output_len
+        if scaler is None:
+            scaler = MinMaxScaler()
+            scaler.fit(dataset.to_numpy())
+        self.scaler = scaler
         
     def __len__(self):
-        return len(self.data) - (self.window_len + self.output_len) + 1
+        return len(self.dataset) - self.window_len - 1
+    
+    def get_scaler(self):
+        return self.scaler
     
     def __getitem__(self, index):
-        src = self.data[index:index + self.window_len]
-        index += self.window_len - 1
-        trg = self.data[index:index + self.output_len]
+        src = self.dataset[index:index + self.window_len]
         index += 1
-        trg_y = self.data[index:index + self.output_len]
-        return src.unsqueeze(-1), trg.unsqueeze(-1), trg_y.unsqueeze(-1)
+        trg = self.dataset[index:index + self.window_len]
+        src = self.scaler.transform(src.reshape(-1, 1))
+        trg = self.scaler.transform(trg.reshape(-1, 1))
+        return torch.from_numpy(src).unsqueeze(-1), torch.from_numpy(trg).unsqueeze(-1)
 
 
-class StockDatasetSW_singlestep(Dataset):
-    def __init__(self, data, window_len):
-        self.data = data
-        self.window_len = window_len
+class YahooDataset(Dataset):
+    def prepare_dataset(self, dataset_path):
+        dataset = pd.read_csv(dataset_path)
         
-    def __len__(self):
-        return len(self.data) - (self.window_len + 1)
+        date_time = pd.to_datetime(dataset['Date'], format='%Y.%m.%d')
+        day = 24*60*60
+        year = (365.2425)*day
+        timestamp_s = date_time.map(pd.Timestamp.timestamp)
+        dataset['Day sin'] = np.sin(timestamp_s * (2 * np.pi / day))
+        dataset['Day cos'] = np.cos(timestamp_s * (2 * np.pi / day))
+        dataset['Year sin'] = np.sin(timestamp_s * (2 * np.pi / year))
+        dataset['Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
+
+        dataset = dataset[['High', 'Low', 'Open', 'Close', 'Volume', 'Adj Close', 'Day sin', 'Day cos', 'Year sin', 'Year cos']]
+        class_idx = 3
+        return dataset, class_idx
     
-    def __getitem__(self, index):
-        src = self.data[index:index + self.window_len]
-        index += 1
-        trg = self.data[index:index + self.window_len]
-        return src.unsqueeze(-1), trg.unsqueeze(-1)
-
-
-class YahooDatasetSW_singlestep(Dataset):
-    def __init__(self, data, window_len, class_idx):
-        self.data = data
-        self.window_len = window_len
+    def split_dataset(self, dataset, train, train_rate):
+        n = len(dataset)
+        if train:
+            return dataset[:int(n * train_rate)]
+        else:
+            return dataset[int(n * (1 - train_rate)):]
+    
+    def __init__(self, dataset_path, window_len, train=True, train_rate=0.7, scaler=None):
+        super().__init__()
+        dataset, class_idx = self.prepare_dataset(dataset_path)
         self.class_idx = class_idx
+        self.dataset = self.split_dataset(dataset, train, train_rate).to_numpy()
+        self.window_len = window_len
+        if scaler is None:
+            scaler = MinMaxScaler()
+            scaler.fit(dataset.to_numpy())
+        self.scaler = scaler
         
     def __len__(self):
-        return len(self.data) - (self.window_len + 1)
+        return len(self.dataset) - self.window_len - 1
+    
+    def get_scaler(self):
+        return self.scaler
     
     def __getitem__(self, index):
-        src = self.data[index:index + self.window_len, :]
+        src = self.dataset[index:index + self.window_len, :]
         index += 1
-        trg = self.data[index:index + self.window_len, self.class_idx]
-        return torch.from_numpy(src).to(torch.float32), torch.from_numpy(trg).unsqueeze(-1).to(torch.float32)
+        trg = self.dataset[index:index + self.window_len, :]
+        src = self.scaler.transform(src)
+        trg = self.scaler.transform(trg)
+        trg = trg[:, self.class_idx]
+        return torch.from_numpy(src).to(torch.float32), torch.from_numpy(trg).unsqueeze(-1).to(torch.float32), self.class_idx
