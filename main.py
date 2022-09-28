@@ -13,8 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep, YahooDatasetSW_singlestep
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, DotProductAttention
 from eval_plot import eval_mae, eval_mae_decoder, plot_scores
-from utils import scaler
-
+from utils import scaler, MyMinMaxScaler
 
 
 sp500_dataset_path = "datasets/spx.csv"
