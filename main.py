@@ -11,6 +11,7 @@ from train import train_model
 
 sp500_dataset_path = "datasets/spx.csv"
 yahoo_dataset_path = "datasets/yahoo_stock.csv"
+predictions_path = "predictions/"
 
 model_type = "decoder"
 
@@ -43,7 +44,7 @@ elif model_type == "decoder":
     model, results = train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_mae, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'])
-    plot_predictions(device, model, test_dl, scaler, "predictions/")
+    plot_predictions(device, model, test_dl, scaler, predictions_path)
 
 elif model_type == "decoder_v2":
     
@@ -69,7 +70,7 @@ elif model_type == "decoder_v2":
     model, results = train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_mae, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'])
-    plot_predictions(device, model, test_dl, scaler, "predictions/")
+    plot_predictions(device, model, test_dl, scaler, predictions_path)
     
 
 elif model_type == "lstm":
