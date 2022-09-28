@@ -43,7 +43,7 @@ class Transformer(nn.Module):
 
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, d_model, num_heads, feedforward_dim):
+    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim):
         super(TransformerDecoder, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
@@ -51,7 +51,7 @@ class TransformerDecoder(nn.Module):
         self.encode_input_layer = nn.Linear(input_size, d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
-        self.output_layer = nn.Linear(d_model, input_size)
+        self.output_layer = nn.Linear(d_model, output_size)
         
     def forward(self, src, src_mask=None):
         src = self.encode_input_layer(src)

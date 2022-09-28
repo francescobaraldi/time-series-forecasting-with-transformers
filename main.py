@@ -8,47 +8,40 @@ import matplotlib.pyplot as plt
 import datetime
 import matplotlib.dates as mdates
 from tqdm import tqdm
+from sklearn.preprocessing import MinMaxScaler
 
-from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep
+from dataset import StockDatasetSW_multistep, StockDatasetSW_singlestep, YahooDatasetSW_singlestep
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, DotProductAttention
 from eval_plot import eval_mae, eval_mae_decoder, plot_scores
 from utils import scaler
 
 
-# d = 1
-# model = DotProductAttention()
-# queries = torch.rand((32, 7, d))
-# keys = torch.rand((32, 7, d))
-# values = torch.rand((32, 7, 1024))
-# out = model(queries, keys, values)
 
-dataset_path = "datasets/spx.csv"
+sp500_dataset_path = "datasets/spx.csv"
+yahoo_dataset_path = "datasets/yahoo_stock.csv"
+sp500 = pd.read_csv(sp500_dataset_path)
+yahoo = pd.read_csv(yahoo_dataset_path)
 
-sp500 = pd.read_csv(dataset_path)
-sp500.head()
-# plt.plot(sp500['close'])
-# plt.show()
+sp500_data = sp500['close'].to_numpy()
+sp500_data = torch.from_numpy(sp500_data).to(torch.float32)
+sp500_trainset = sp500_data[0:int(len(sp500_data) * 0.7)]
+sp500_testset = sp500_data[int(len(sp500_data) * 0.7):]
+sp500_trainset_scaled, sp500_testset_scaled = scaler(sp500_trainset, sp500_testset)
 
-# dates = [datetime.datetime.strptime(date, '%Y-%m-%d').date() for date in sp500['Date']]
-# dates = mdates.drange(dates[0], dates[-1], datetime.timedelta(days=30))
-# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-# plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=5))
-# plt.plot(dates, sp500['Close'])
-# plt.gcf().autofmt_xdate()
-# plt.show()
-
-
-data = sp500['close'].to_numpy()
-data = torch.from_numpy(data).to(torch.float32)
-
-trainset = data[0:int(len(data) * 0.7)]
-testset = data[int(len(data) * 0.7):]
-
-trainset_scaled, testset_scaled = scaler(trainset, testset)
+yahoo_data = yahoo[['High', 'Low', 'Open', 'Close', 'Volume', 'Adj Close']]
+yahoo_class_idx = 3
+yahoo_trainset = yahoo_data.iloc[:int(len(yahoo_data) * 0.7)]
+yahoo_testset = yahoo_data.iloc[int(len(yahoo_data) * 0.7):]
+scaler = MinMaxScaler()
+scaler.fit(yahoo_trainset)
+yahoo_trainset_scaled = scaler.transform(yahoo_trainset)
+yahoo_testset_scaled = scaler.transform(yahoo_testset)
 
 decoder = True
 
 if not decoder:
+
+    trainset, testset = sp500_trainset_scaled, sp500_testset_scaled
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
@@ -56,27 +49,22 @@ if not decoder:
     epochs = 10
     window_len = 7
     output_len = 3
-    train_dataset = StockDatasetSW_multistep(trainset_scaled, window_len, output_len)
-    test_dataset = StockDatasetSW_multistep(testset_scaled, window_len, output_len)
+    train_dataset = StockDatasetSW_multistep(trainset, window_len, output_len)
+    test_dataset = StockDatasetSW_multistep(testset, window_len, output_len)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     model = Transformer(seq_len=window_len, num_encoder=6, num_decoder=6, input_size=1, output_size=output_len, d_model=512, num_heads=8, feedforward_dim=1024).to(device)
     loss_fun = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
     train_maes = []
     test_maes = []
-
     for e in tqdm(range(epochs)):
         model.eval()
-
         train_mae = eval_mae(model, train_dl, device)
         test_mae = eval_mae(model, test_dl, device)
         train_maes.append(train_mae.cpu())
         test_maes.append(test_mae.cpu())
-
         print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
-
         model.train()
         for i, (src, trg, trg_y) in enumerate(train_dl):
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
@@ -87,38 +75,36 @@ if not decoder:
                 print(f'loss {loss.cpu().item():.3f}')
             loss.backward()
             optimizer.step()
-
     plot_scores(train_maes, test_maes)
 
 else:
 
+    trainset, testset = yahoo_trainset_scaled, yahoo_testset_scaled
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
-    learning_rate = 0.01
-    epochs = 10
+    learning_rate = 0.001
+    epochs = 20
     window_len = 7
-    train_dataset = StockDatasetSW_singlestep(trainset, window_len)
-    test_dataset = StockDatasetSW_singlestep(testset, window_len)
+    input_size = 6
+    output_size = 1
+    train_dataset = YahooDatasetSW_singlestep(trainset, window_len, yahoo_class_idx)
+    test_dataset = YahooDatasetSW_singlestep(testset, window_len, yahoo_class_idx)
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    model = TransformerDecoder(seq_len=window_len, num_layer=1, input_size=1, d_model=1, num_heads=1, feedforward_dim=32).to(device)
+    model = TransformerDecoder(seq_len=window_len, num_layer=1, input_size=input_size, output_size=output_size, d_model=6, num_heads=1, feedforward_dim=32).to(device)
     loss_fun = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
     train_maes = []
     test_maes = []
     losses = []
-
     for e in tqdm(range(epochs)):
         model.eval()
-
         train_mae = eval_mae_decoder(model, train_dl, device)
         test_mae = eval_mae_decoder(model, test_dl, device)
         train_maes.append(train_mae.cpu())
         test_maes.append(test_mae.cpu())
-
         print(f"Epoch {e} - Train MAE {train_mae} - Test MAE {test_mae}")
-
         model.train()
         avg_loss = 0
         count = 0
@@ -135,5 +121,4 @@ else:
             count += 1
         avg_loss /= count
         losses.append(avg_loss)
-
     plot_scores(train_maes, test_maes, losses)
