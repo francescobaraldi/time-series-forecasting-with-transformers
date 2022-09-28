@@ -47,7 +47,7 @@ class TransformerDecoder(nn.Module):
         super(TransformerDecoder, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
-        self.positional = Time2Vec(input_size, d_model)
+        # self.positional = Time2Vec(input_size, d_model)
         self.encode_input_layer = nn.Linear(input_size, d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
@@ -55,12 +55,12 @@ class TransformerDecoder(nn.Module):
         
     def forward(self, src, src_mask=None):
         src = self.encode_input_layer(src)
-        src_pos = self.positional(src)
+        # src_pos = self.positional(src)
         
         if src_mask is None:
             src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
         
-        encoder_output = self.encoder(src_pos, src_mask)
+        encoder_output = self.encoder(src, src_mask)
         output = self.output_layer(encoder_output)
         
         return output
@@ -71,24 +71,23 @@ class TransformerDecoder(nn.Module):
 
 
 class TransformerDecoder_v2(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, d_model, num_heads, feedforward_dim):
+    def __init__(self, seq_len, num_layer, input_size, output_size, num_heads, feedforward_dim):
         super(TransformerDecoder_v2, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
-        self.d_model = d_model
-        self.positional = PositionalEncoderStd(d_model=d_model)
-        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
+        self.output_size = output_size
+        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
+        self.output_layer = nn.Linear(input_size, output_size)
         
     def forward(self, src, src_mask=None):
-        src_pos = self.positional(src)
-        
         if src_mask is None:
             src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
         
-        encoder_output = self.encoder(src_pos, src_mask)
+        encoder_output = self.encoder(src, src_mask)
+        output = self.output_layer(encoder_output)
         
-        return encoder_output
+        return output
         
     
     def generate_mask(self, dim1, dim2):
