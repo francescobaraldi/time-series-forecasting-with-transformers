@@ -94,14 +94,20 @@ class TransformerDecoder_v2(nn.Module):
         return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
 
-class DotProductAttention(nn.Module):
-    def __init__(self):
-        super(DotProductAttention, self).__init__()
-        
-    def forward(self, queries, keys, values):
-        import math
-        d = queries.shape[-1]
-        scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
-        self.attention_weights = torch.nn.functional.softmax(scores)
-        out = torch.bmm(self.attention_weights, values)
-        return out
+class WeatherLSTM(nn.Module):
+    def __init__(self, input_size, hidden_dim, output_size):
+        super(WeatherLSTM, self).__init__()
+        self.hidden_dim = hidden_dim
+
+        self.lstm = nn.LSTM(input_size, hidden_dim, batch_first=True)
+        self.net = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, output_size)
+        )
+
+    def forward(self, X: torch.Tensor):
+        _, (h_n, _) = self.lstm(X)
+        h_n = h_n[0]
+        output = self.net(h_n)[:, 0]
+        return output
