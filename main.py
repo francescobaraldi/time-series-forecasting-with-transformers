@@ -8,7 +8,7 @@ from model import Transformer, TransformerDecoder, TransformerDecoder_v2, Weathe
 from eval import eval_mae
 from plot import plot_scores, plot_predictions
 from train import train_model
-from test import test
+from test import test, test2
 
 sp500_dataset_path = "datasets/spx.csv"
 yahoo_dataset_path = "datasets/yahoo_stock.csv"
@@ -47,9 +47,9 @@ elif model_type == "decoder":
     model, results = train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_mae, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'], training_results_path + model_type + "/")
-    inference_dataset = YahooDatasetInference(yahoo_dataset_path, window_len, scaler, forecast_len)
-    inference_dl = DataLoader(inference_dataset, batch_size=1, shuffle=False, drop_last=True)
-    test(device, model, inference_dl, output_size, scaler, save_path=predictions_path + model_type + "/")
+    # inference_dataset = YahooDatasetInference(yahoo_dataset_path, window_len, scaler, forecast_len)
+    # inference_dl = DataLoader(inference_dataset, batch_size=1, shuffle=False, drop_last=True)
+    test2(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type + "/")
 
 elif model_type == "decoder_v2":
     

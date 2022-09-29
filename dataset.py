@@ -81,7 +81,7 @@ class YahooDataset(Dataset):
         self.scaler = scaler
         
     def __len__(self):
-        return len(self.dataset) - self.window_len - 1
+        return len(self.dataset) - self.window_len - self.forecast_len
     
     def get_scaler(self):
         return self.scaler
@@ -89,7 +89,7 @@ class YahooDataset(Dataset):
     def __getitem__(self, index):
         src = self.dataset[index:index + self.window_len, :]
         trg_forecast = self.dataset[index + self.window_len: index + self.window_len + self.forecast_len, :]
-        index += 1
+        index += self.forecast_len
         trg = self.dataset[index:index + self.window_len, :]
         src = self.scaler.transform(src)
         trg = self.scaler.transform(trg)
