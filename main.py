@@ -3,19 +3,19 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from dataset import SP500Dataset, YahooDataset, YahooDatasetInference
+from dataset import SP500Dataset, YahooDataset
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, WeatherLSTM
 from eval import eval_mae
-from plot import plot_scores, plot_predictions
+from plot import plot_scores
 from train import train_model
-from test import test, test2
+from test import test
 
 sp500_dataset_path = "datasets/spx.csv"
 yahoo_dataset_path = "datasets/yahoo_stock.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 
-model_type = "decoder"
+model_type = "decoder_v2"
 
 if model_type == "transformer":
 
@@ -47,19 +47,17 @@ elif model_type == "decoder":
     model, results = train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_mae, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'], training_results_path + model_type + "/")
-    # inference_dataset = YahooDatasetInference(yahoo_dataset_path, window_len, scaler, forecast_len)
-    # inference_dl = DataLoader(inference_dataset, batch_size=1, shuffle=False, drop_last=True)
-    test2(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type + "/")
+    test(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type + "/")
 
 elif model_type == "decoder_v2":
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
     learning_rate = 0.01
-    num_epochs = 5
-    window_len = 7
+    num_epochs = 10
+    window_len = 30
     forecast_len = 7
-    input_size = 10
+    input_size = 5
     output_size = 1
     
     train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
@@ -68,16 +66,14 @@ elif model_type == "decoder_v2":
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     
-    model = TransformerDecoder_v2(seq_len=window_len, num_layer=1, input_size=input_size, output_size=output_size, num_heads=1, feedforward_dim=32).to(device)
+    model = TransformerDecoder_v2(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, num_heads=input_size, feedforward_dim=2048).to(device)
     loss_fn = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
     model, results = train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_mae, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'], training_results_path + model_type + "/")
-    inference_dataset = YahooDatasetInference(yahoo_dataset_path, window_len, scaler, forecast_len)
-    inference_dl = DataLoader(inference_dataset, batch_size=1, shuffle=False, drop_last=True)
-    test(device, model, inference_dl, output_size, scaler, save_path=predictions_path + model_type + "/")
+    test(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type + "/")
     
 
 elif model_type == "lstm":
