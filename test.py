@@ -13,4 +13,4 @@ def test(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
             class_idx = class_idx[0].item()
             src, trg = src.to(device), trg.to(device)
             out = model(src)
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), out[0:1, :, :].cpu(), scaler, forecast_len, class_idx.cpu(), j, save_path)
+            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), out[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j, save_path)
