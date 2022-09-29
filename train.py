@@ -19,11 +19,12 @@ def train_model(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn,
         model.train()
         avg_loss = 0
         count = 0
-        for i, (src, trg, _) in enumerate(train_dl):
+        for i, (src, trg, class_idx) in enumerate(train_dl):
+            class_idx = class_idx[0].item()
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)
-            loss = loss_fn(out, trg)
+            loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
             avg_loss += loss.cpu().detach().numpy().item()
             if i % 10 == 0:
                 print(f'loss {loss.cpu().item():.6f}')
