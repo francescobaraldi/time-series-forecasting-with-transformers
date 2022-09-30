@@ -8,7 +8,8 @@ def test(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
     
     with torch.no_grad():
         for j, (src, trg, class_idx) in enumerate(dl):
-            if j == max_num:
+            _, window_len, _ = src.shape
+            if j == max_num or j % window_len != 0:
                 break
             class_idx = class_idx[0].item()
             src, trg = src.to(device), trg.to(device)
@@ -22,13 +23,13 @@ def test2(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
     
     with torch.no_grad():
         for j, (input, trg, class_idx) in enumerate(dl):
-            if j == max_num:
+            _, window_len, _ = src.shape
+            if j == max_num or j % window_len != 0:
                 break
             
             class_idx = class_idx[0].item()
             src = input[:, :-1, :]
             src, trg = src.to(device), trg.to(device)
-            _, window_len, _ = src.shape
             prediction = torch.zeros((window_len + forecast_len - 1, trg.shape[2]))
             first = True
             current_src = src
@@ -51,15 +52,15 @@ def test_std(device, model, dl, forecast_len, scaler, max_num=40, save_path=None
     
     with torch.no_grad():
         for j, (input, trg_y, class_idx) in enumerate(dl):
-            if j == max_num:
+            _, window_len, _ = src.shape
+            if j == max_num or j % window_len != 0:
                 break
             
             class_idx = class_idx[0].item()
             src = input[:, :-1, :]
             trg = input[:, 1:, :]
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
-            trg_y = trg_y[:, -forecast_len, :]
-            _, window_len, _ = src.shape
+            trg_y = trg_y[:, -forecast_len:, :]
             prediction = torch.zeros((window_len + forecast_len - 1, trg.shape[2]))
             first = True
             current_src = src
