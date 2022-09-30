@@ -67,16 +67,18 @@ elif model_type == "decoder":
     num_layers = [1, 3, 6]
     d_models = [8, 32]
     dropouts = [0, 0.1]
+    feedforward_dims = [64, 512, 1024, 2048]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:
                 for num_layer in num_layers:
                     for d_model in d_models:
                         for dropout in dropouts:
-                            train_and_test_model(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
-                                                 output_size, num_layer, dropout, train_dataset, test_dataset, model_cls,
-                                                 loss_fn, optim_cls, train_fn, eval_fn, training_results_path, predictions_path,
-                                                 model_type, d_model)
+                            for feedforward_dim in feedforward_dims:
+                                train_and_test_model(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
+                                                     output_size, num_layer, dropout, feedforward_dim, train_dataset, test_dataset,
+                                                     model_cls, loss_fn, optim_cls, train_fn, eval_fn, training_results_path,
+                                                     predictions_path, model_type, d_model)
 
 elif model_type == "decoder_v2":
     
@@ -98,15 +100,17 @@ elif model_type == "decoder_v2":
     num_epochs = [1, 10, 50, 100]
     num_layers = [1, 3, 6]
     dropouts = [0, 0.1]
+    feedforward_dims = [64, 512, 1024, 2048]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:
                 for num_layer in num_layers:
                     for dropout in dropouts:
-                        train_and_test_model(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
-                                             output_size, num_layer, dropout, train_dataset, test_dataset, model_cls,
-                                             loss_fn, optim_cls, train_fn, eval_fn, training_results_path, predictions_path,
-                                             model_type)
+                        for feedforward_dim in feedforward_dims:
+                            train_and_test_model(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
+                                                 output_size, num_layer, dropout, feedforward_dim, train_dataset, test_dataset,
+                                                 model_cls, loss_fn, optim_cls, train_fn, eval_fn, training_results_path,
+                                                 predictions_path, model_type)
 
 elif model_type == "lstm":
     
