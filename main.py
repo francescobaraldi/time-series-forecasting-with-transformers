@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from dataset import SP500Dataset, YahooDataset, YahooDataset2, YahooDatasetStd
-from model import Transformer, TransformerDecoder, TransformerDecoder_v2, WeatherLSTM
+from model import Transformer, TransformerDecoder, TransformerDecoder_v2, TransformerDecoderPos
 from eval import eval_mae, eval_mae_std
 from plot import plot_scores
 from train import train_model, train_model_std, train_and_test_model
@@ -55,19 +55,19 @@ elif model_type == "decoder":
     train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
     test_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
-    model_cls = TransformerDecoder
-    loss_fn = nn.L1Loss()
+    model_cls = TransformerDecoderPos
+    loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
     train_fn = train_model
     eval_fn = eval_mae
     
     batch_sizes = [32]
     learning_rates = [0.001]
-    num_epochs = [50]
-    num_layers = [1, 3]
+    num_epochs = [10]
+    num_layers = [1]
     d_models = [32]
-    dropouts = [0.1]
-    feedforward_dims = [64, 2048]
+    dropouts = [0]
+    feedforward_dims = [64]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:
