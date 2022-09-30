@@ -1,4 +1,3 @@
-from curses import window
 import torch
 from plot import plot_predictions, plot_predictions2
 
