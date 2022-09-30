@@ -79,6 +79,12 @@ class TransformerDecoder_v2(nn.Module):
         encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
         self.output_layer = nn.Linear(input_size, output_size)
+        self.init_weights()
+    
+    def init_weights(self):
+        initrange = 0.1
+        self.decoder.bias.data.zero_()
+        self.decoder.weight.data.uniform_(-initrange, initrange)
         
     def forward(self, src, src_mask=None):
         if src_mask is None:
