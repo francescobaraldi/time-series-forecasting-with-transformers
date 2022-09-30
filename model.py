@@ -83,8 +83,8 @@ class TransformerDecoder_v2(nn.Module):
     
     def init_weights(self):
         initrange = 0.1
-        self.decoder.bias.data.zero_()
-        self.decoder.weight.data.uniform_(-initrange, initrange)
+        self.output_layer.bias.data.zero_()
+        self.output_layer.weight.data.uniform_(-initrange, initrange)
         
     def forward(self, src, src_mask=None):
         if src_mask is None:

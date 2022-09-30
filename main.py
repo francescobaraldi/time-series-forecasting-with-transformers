@@ -55,9 +55,9 @@ elif model_type == "decoder_v2":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
     learning_rate = 0.001
-    num_epochs = 50
-    window_len = 365
-    forecast_len = 60
+    num_epochs = 25
+    window_len = 30
+    forecast_len = 7
     input_size = 5
     output_size = 1
     dropout = 0
