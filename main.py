@@ -15,7 +15,7 @@ yahoo_dataset_path = "datasets/yahoo_stock.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 
-model_type = "transformer"
+model_type = "decoder_v2"
 
 if model_type == "transformer":
 
@@ -80,7 +80,7 @@ elif model_type == "decoder_v2":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 1
     learning_rate = 0.001
-    num_epochs = 10
+    num_epochs = 1
     window_len = 360
     forecast_len = 60
     input_size = 5
