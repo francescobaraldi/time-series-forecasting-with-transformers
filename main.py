@@ -33,6 +33,7 @@ elif model_type == "decoder":
     input_size = 5
     output_size = 1
     d_model = 32
+    dropout = 0
     
     train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
@@ -40,7 +41,7 @@ elif model_type == "decoder":
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     
-    model = TransformerDecoder(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, d_model=d_model, num_heads=d_model, feedforward_dim=64).to(device)
+    model = TransformerDecoder(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, d_model=d_model, num_heads=d_model, feedforward_dim=64, dropout=dropout).to(device)
     loss_fn = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
@@ -59,6 +60,7 @@ elif model_type == "decoder_v2":
     forecast_len = 60
     input_size = 5
     output_size = 1
+    dropout = 0
     
     train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
@@ -66,7 +68,7 @@ elif model_type == "decoder_v2":
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     
-    model = TransformerDecoder_v2(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, num_heads=input_size, feedforward_dim=2048).to(device)
+    model = TransformerDecoder_v2(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, num_heads=input_size, feedforward_dim=2048, dropout=dropout).to(device)
     loss_fn = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     

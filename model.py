@@ -43,13 +43,13 @@ class Transformer(nn.Module):
 
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim):
+    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
         super(TransformerDecoder, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
         # self.positional = Time2Vec(input_size, d_model)
         self.encode_input_layer = nn.Linear(input_size, d_model)
-        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
+        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
         self.output_layer = nn.Linear(d_model, output_size)
         
@@ -71,12 +71,12 @@ class TransformerDecoder(nn.Module):
 
 
 class TransformerDecoder_v2(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, num_heads, feedforward_dim):
+    def __init__(self, seq_len, num_layer, input_size, output_size, num_heads, feedforward_dim, dropout=0.1):
         super(TransformerDecoder_v2, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size
         self.output_size = output_size
-        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=0, batch_first=True)
+        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
         self.output_layer = nn.Linear(input_size, output_size)
         
