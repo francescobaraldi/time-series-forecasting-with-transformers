@@ -26,13 +26,13 @@ elif model_type == "decoder":
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
-    learning_rate = 0.01
+    learning_rate = 0.001
     num_epochs = 50
-    window_len = 30
-    forecast_len = 7
+    window_len = 365
+    forecast_len = 60
     input_size = 5
     output_size = 1
-    d_model = 20
+    d_model = 32
     
     train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
@@ -40,7 +40,7 @@ elif model_type == "decoder":
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     
-    model = TransformerDecoder(seq_len=window_len, num_layer=1, input_size=input_size, output_size=output_size, d_model=d_model, num_heads=1, feedforward_dim=32).to(device)
+    model = TransformerDecoder(seq_len=window_len, num_layer=3, input_size=input_size, output_size=output_size, d_model=d_model, num_heads=d_model, feedforward_dim=64).to(device)
     loss_fn = nn.L1Loss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
@@ -53,10 +53,10 @@ elif model_type == "decoder_v2":
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch_size = 32
-    learning_rate = 0.01
-    num_epochs = 10
-    window_len = 30
-    forecast_len = 7
+    learning_rate = 0.001
+    num_epochs = 50
+    window_len = 365
+    forecast_len = 60
     input_size = 5
     output_size = 1
     

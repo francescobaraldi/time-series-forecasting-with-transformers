@@ -76,7 +76,7 @@ class TransformerDecoder_v2(nn.Module):
         self.seq_len = seq_len
         self.input_size = input_size
         self.output_size = output_size
-        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, batch_first=True)
+        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=0, batch_first=True)
         self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
         self.output_layer = nn.Linear(input_size, output_size)
         
