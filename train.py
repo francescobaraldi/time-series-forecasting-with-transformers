@@ -64,7 +64,7 @@ def train_model2(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn
             out = model(src)
             loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
             avg_loss += loss.cpu().detach().numpy().item()
-            if i % 10 == 0:
+            if i % 100 == 0:
                 print(f'loss {loss.cpu().item():.6f}')
             loss.backward()
             optimizer.step()
@@ -102,7 +102,7 @@ def train_model_std(device, model, train_dl, test_dl, num_epochs, loss_fn, score
             out = model(src, trg)
             loss = loss_fn(out, trg_y[:, :, class_idx].unsqueeze(-1))
             avg_loss += loss.cpu().detach().numpy().item()
-            if i % 10 == 0:
+            if i % 100 == 0:
                 print(f'loss {loss.cpu().item():.6f}')
             loss.backward()
             optimizer.step()
