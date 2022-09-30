@@ -134,6 +134,6 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, window_len, fore
     model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer)
     
     plot_scores(results['train_scores'], results['test_scores'], results['losses'], training_results_path + model_type +
-                f"/training_results_batch_size_{batch_size}_learning_rate_{learning_rate}_num_epochs_{num_epochs}_num_layer_{num_layer}_d_model_{d_model}_dropout_{dropout}.png")
+                f"/training_results_batch_size_{batch_size}_learning_rate_{learning_rate}_num_epochs_{num_epochs}_num_layer_{num_layer}_d_model_{d_model}_dropout_{dropout}_feedforward_dim_{feedforward_dim}.png")
     test(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type +
-         f"/predictions_batch_size_{batch_size}_learning_rate_{learning_rate}_num_epochs_{num_epochs}_num_layer_{num_layer}_d_model_{d_model}_dropout_{dropout}")
+         f"/predictions_batch_size_{batch_size}_learning_rate_{learning_rate}_num_epochs_{num_epochs}_num_layer_{num_layer}_d_model_{d_model}_dropout_{dropout}_feedforward_dim_{feedforward_dim}")
