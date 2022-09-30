@@ -71,7 +71,7 @@ class TransformerDecoder(nn.Module):
 
 
 class TransformerDecoder_v2(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, num_heads, feedforward_dim, dropout=0.1):
+    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
         super(TransformerDecoder_v2, self).__init__()
         self.seq_len = seq_len
         self.input_size = input_size

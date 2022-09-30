@@ -26,7 +26,7 @@ def plot_scores(train_scores, test_scores, losses, save_path=None):
     if save_path is None:
         plt.show()
     else:
-        plt.savefig(save_path + f"training_results_{num_epochs}_epochs.png")
+        plt.savefig(save_path)
         
 
 def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, save_path=None):
@@ -49,7 +49,7 @@ def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, 
     if save_path is None:
         plt.show()
     else:
-        plt.savefig(save_path + f"prediction_{i}.png")
+        plt.savefig(save_path + f"_{i}.png")
 
 
 def plot_predictions2(src, trg, predictions, scaler, forecast_len, class_idx, i, save_path=None):

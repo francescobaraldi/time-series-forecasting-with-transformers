@@ -8,8 +8,8 @@ def test(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
     
     with torch.no_grad():
         for j, (src, trg, class_idx) in enumerate(dl):
-            if j % max_num != 0:
-                continue
+            if j >= max_num:
+                break
             class_idx = class_idx[0].item()
             src, trg = src.to(device), trg.to(device)
             _, window_len, _ = src.shape
