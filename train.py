@@ -126,7 +126,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, window_len, fore
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     scaler = train_dataset.get_scaler()
     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     
     model = model_cls(seq_len=window_len, num_layer=num_layer, input_size=input_size, output_size=output_size, d_model=d_model, num_heads=d_model, feedforward_dim=feedforward_dim, dropout=dropout).to(device)
     optimizer = optim_cls(model.parameters(), lr=learning_rate)

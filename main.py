@@ -61,13 +61,13 @@ elif model_type == "decoder":
     train_fn = train_model
     eval_fn = eval_mae
     
-    batch_sizes = [16, 32, 64]
-    learning_rates = [0.1, 0.01, 0.001, 0.0001]
-    num_epochs = [1, 10, 50, 100]
-    num_layers = [1, 3, 6]
-    d_models = [8, 32]
-    dropouts = [0, 0.1]
-    feedforward_dims = [64, 512, 1024, 2048]
+    batch_sizes = [32]
+    learning_rates = [0.001]
+    num_epochs = [50]
+    num_layers = [1, 3]
+    d_models = [32]
+    dropouts = [0.1]
+    feedforward_dims = [64, 2048]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:
@@ -95,12 +95,12 @@ elif model_type == "decoder_v2":
     train_fn = train_model
     eval_fn = eval_mae
     
-    batch_sizes = [16, 32, 64]
-    learning_rates = [0.1, 0.01, 0.001, 0.0001]
-    num_epochs = [1, 10, 50, 100]
-    num_layers = [1, 3, 6]
-    dropouts = [0, 0.1]
-    feedforward_dims = [64, 512, 1024, 2048]
+    batch_sizes = [32]
+    learning_rates = [0.001]
+    num_epochs = [50]
+    num_layers = [1, 3]
+    dropouts = [0.1]
+    feedforward_dims = [64, 2048]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:
