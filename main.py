@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from dataset import SP500Dataset, YahooDataset, YahooDataset2, YahooDatasetStd
+from dataset import SP500Dataset, YahooDataset, YahooDataset2, YahooDatasetStd, YahooDatasetPos
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, TransformerDecoderPos
 from eval import eval_mae, eval_mae_std
 from plot import plot_scores
@@ -50,11 +50,11 @@ elif model_type == "decoder":
     
     window_len = 365
     forecast_len = 60
-    input_size = 5
+    input_size = 1
     output_size = 1
-    train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
+    train_dataset = YahooDatasetPos(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
-    test_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
+    test_dataset = YahooDatasetPos(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
     model_cls = TransformerDecoderPos
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
