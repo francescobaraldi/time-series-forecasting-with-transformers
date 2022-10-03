@@ -63,7 +63,7 @@ elif model_type == "decoder":
     
     batch_sizes = [32]
     learning_rates = [0.001]
-    num_epochs = [50]
+    num_epochs = [1]
     num_layers = [1]
     d_models = [32]
     dropouts = [0.1]

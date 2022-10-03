@@ -23,8 +23,8 @@ def test2(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
     
     with torch.no_grad():
         for j, (input, trg, class_idx) in enumerate(dl):
-            if j % max_num != 0:
-                continue
+            if j >= max_num:
+                break
             
             class_idx = class_idx[0].item()
             src = input[:, :-1, :]
@@ -52,8 +52,8 @@ def test_std(device, model, dl, forecast_len, scaler, max_num=40, save_path=None
     
     with torch.no_grad():
         for j, (input, trg_y, class_idx) in enumerate(dl):
-            if j % max_num != 0:
-                continue
+            if j >= max_num:
+                break
             
             class_idx = class_idx[0].item()
             src = input[:, :-1, :]
