@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 
 from dataset import SP500Dataset, YahooDataset, YahooDataset2, YahooDatasetStd, YahooDatasetPos
 from model import Transformer, TransformerDecoder, TransformerDecoder_v2, TransformerDecoderPos
-from eval import eval_mae, eval_mae_std
+from eval import eval_mae, eval_mae_std, eval_mae2
 from plot import plot_scores
-from train import train_model, train_model_std, train_and_test_model
+from train import train_model, train_model_std, train_and_test_model, train_model2, train_and_test_model2
 from test import test_std
 
 sp500_dataset_path = "datasets/spx.csv"
@@ -49,24 +49,24 @@ if model_type == "transformer":
 elif model_type == "decoder":
     
     window_len = 365
-    forecast_len = 60
-    input_size = 1
+    forecast_len = 30
+    input_size = 5
     output_size = 1
-    train_dataset = YahooDatasetPos(yahoo_dataset_path, window_len, forecast_len, train=True)
+    train_dataset = YahooDataset2(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
-    test_dataset = YahooDatasetPos(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
-    model_cls = TransformerDecoderPos
+    test_dataset = YahooDataset2(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
+    model_cls = TransformerDecoder
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model
-    eval_fn = eval_mae
+    train_fn = train_model2
+    eval_fn = eval_mae2
     
     batch_sizes = [32]
     learning_rates = [0.001]
-    num_epochs = [10]
+    num_epochs = [50]
     num_layers = [1]
     d_models = [32]
-    dropouts = [0]
+    dropouts = [0.1]
     feedforward_dims = [64]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
@@ -75,7 +75,7 @@ elif model_type == "decoder":
                     for d_model in d_models:
                         for dropout in dropouts:
                             for feedforward_dim in feedforward_dims:
-                                train_and_test_model(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
+                                train_and_test_model2(batch_size, learning_rate, num_epoch, window_len, forecast_len, input_size,
                                                      output_size, num_layer, dropout, feedforward_dim, train_dataset, test_dataset,
                                                      model_cls, loss_fn, optim_cls, train_fn, eval_fn, training_results_path,
                                                      predictions_path, model_type, d_model)
@@ -83,14 +83,14 @@ elif model_type == "decoder":
 elif model_type == "decoder_v2":
     
     window_len = 365
-    forecast_len = 60
+    forecast_len = 30
     input_size = 5
     output_size = 1
-    train_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=True)
+    train_dataset = YahooDataset2(yahoo_dataset_path, window_len, forecast_len, train=True)
     scaler = train_dataset.get_scaler()
-    test_dataset = YahooDataset(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
+    test_dataset = YahooDataset2(yahoo_dataset_path, window_len, forecast_len, train=False, scaler=scaler)
     model_cls = TransformerDecoder_v2
-    loss_fn = nn.L1Loss()
+    loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
     train_fn = train_model
     eval_fn = eval_mae
@@ -98,9 +98,9 @@ elif model_type == "decoder_v2":
     batch_sizes = [32]
     learning_rates = [0.001]
     num_epochs = [50]
-    num_layers = [1, 3]
+    num_layers = [1]
     dropouts = [0.1]
-    feedforward_dims = [64, 2048]
+    feedforward_dims = [64]
     for batch_size in batch_sizes:
         for learning_rate in learning_rates:
             for num_epoch in num_epochs:

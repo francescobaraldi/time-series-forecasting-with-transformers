@@ -30,7 +30,7 @@ def test2(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
             src = input[:, :-1, :]
             src, trg = src.to(device), trg.to(device)
             _, window_len, _ = src.shape
-            prediction = torch.zeros((window_len + forecast_len - 1, trg.shape[2]))
+            prediction = torch.zeros((window_len + forecast_len - 1, 1))
             first = True
             current_src = src
             for i in range(forecast_len):
