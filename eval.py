@@ -26,8 +26,8 @@ def eval_mae_singlestep(model, dl, device, scaler=None):
             trg = input[:, 1:, :]
             src, trg = src.to(device), trg.to(device)
             out = model(src)
-            trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
-            # trg, out = trg.to(device), out.to(device)
+            if scaler is not None:
+                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
             mae = torch.mean(torch.abs((out - trg[:, :, class_idx].unsqueeze(-1))))
             cum_score += mae
             total += 1
@@ -48,12 +48,7 @@ def eval_mae_multistep(model, dl, device, scaler=None):
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
-                for b in range(out.shape[0]):
-                    add = np.zeros(out.shape[1], trg.shape[2])
-                    out_rec = scaler.inverse_transform(out[b, :, :].cpu() + add)
-                    trg_rec = scaler.inverse_transform(trg[b, :, :].cpu())
-                    out[b, :, 0] = torch.from_numpy(out_rec[:, 0]).to(device)
-                    trg[b, :, :] = torch.from_numpy(trg_rec).to(device)
+                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
             mae = torch.mean(torch.abs((out - trg[:, :, class_idx].unsqueeze(-1))))
             cum_score += mae
             total += 1
@@ -75,12 +70,7 @@ def eval_mape_singlestep(model, dl, device, scaler=None):
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
-                for b in range(out.shape[0]):
-                    add = np.zeros(out.shape[1], trg.shape[2])
-                    out_rec = scaler.inverse_transform(out[b, :, :].cpu() + add)
-                    trg_rec = scaler.inverse_transform(trg[b, :, :].cpu())
-                    out[b, :, 0] = torch.from_numpy(out_rec[:, 0]).to(device)
-                    trg[b, :, :] = torch.from_numpy(trg_rec).to(device)
+                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
             mape = torch.mean(torch.abs((out - trg[:, :, class_idx].unsqueeze(-1)) / trg[:, :, class_idx].unsqueeze(-1)))
             cum_score += mape
             total += 1
@@ -101,12 +91,7 @@ def eval_mape_multistep(model, dl, device, scaler=None):
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
-                for b in range(out.shape[0]):
-                    add = np.zeros(out.shape[1], trg.shape[2])
-                    out_rec = scaler.inverse_transform(out[b, :, :].cpu() + add)
-                    trg_rec = scaler.inverse_transform(trg[b, :, :].cpu())
-                    out[b, :, 0] = torch.from_numpy(out_rec[:, 0]).to(device)
-                    trg[b, :, :] = torch.from_numpy(trg_rec).to(device)
+                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
             mape = torch.mean(torch.abs((out - trg[:, :, class_idx].unsqueeze(-1)) / trg[:, :, class_idx].unsqueeze(-1)))
             cum_score += mape
             total += 1
