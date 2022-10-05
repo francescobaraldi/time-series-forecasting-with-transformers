@@ -1,120 +1,43 @@
 import torch
 import torch.nn as nn
-from positional_encoding import PositionalEncoderStd, Time2Vec
-
-
-class Transformer(nn.Module):
-    def __init__(self, seq_len, num_encoder, num_decoder, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
-        super(Transformer, self).__init__()
-        self.seq_len = seq_len
-        self.input_size = input_size
-        self.output_size = output_size
-        # self.positional = PositionalEncoderStd(d_model=d_model)
-        self.encode_input_layer = nn.Linear(input_size, d_model)
-        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encode_layer, num_encoder)
-        # self.positional = nn.parameter.Parameter(torch.rand(d_model))
-        self.decode_input_layer = nn.Linear(input_size, d_model)
-        decode_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
-        self.decoder = nn.TransformerDecoder(decoder_layer=decode_layer, num_layers=num_decoder)
-        self.output_layer = nn.Linear(d_model, output_size)
-        
-    def forward(self, src, trg, src_mask=None, trg_mask=None):
-        src = self.encode_input_layer(src)
-        # src_pos = self.positional(src)
-        encoder_output = self.encoder(src)
-        
-        trg = self.decode_input_layer(trg)
-        
-        if src_mask is None:
-            src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
-        if trg_mask is None:
-            trg_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
-        
-        decoder_output = self.decoder(tgt=trg, memory=encoder_output, tgt_mask=trg_mask, memory_mask=src_mask)
-        
-        output = self.output_layer(decoder_output)
-        
-        return output
-        
-    
-    def generate_mask(self, dim1, dim2):
-        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
+from positional_encoding import SinusoidalPositionalEncoder, LearnablePositionalEncoder
 
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
+    def __init__(self, seq_len, num_layers, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1,
+                 positional_encoding="none"):
         super(TransformerDecoder, self).__init__()
+        
+        if positional_encoding == "sinusoidal":
+            self.positional = SinusoidalPositionalEncoder(seq_len=seq_len, d_model=d_model, dropout=dropout)
+        elif positional_encoding == "learnable":
+            self.positional = LearnablePositionalEncoder(seq_len=seq_len, d_model=d_model, dropout=dropout)
+        elif positional_encoding == "none":
+            self.positional = None
+        else:
+            raise Exception("Positional encoding type not recognized: use 'none', 'sinusoidal' or 'learnable'.")
+        
         self.seq_len = seq_len
-        self.input_size = input_size
-        # self.positional = Time2Vec(input_size, d_model)
         self.encode_input_layer = nn.Linear(input_size, d_model)
         encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
+        self.encoder = nn.TransformerEncoder(encoder_layer=encode_layer, num_layers=num_layers)
         self.output_layer = nn.Linear(d_model, output_size)
         
-    def forward(self, src, src_mask=None):
-        src = self.encode_input_layer(src)
-        # src_pos = self.positional(src)
-        
-        if src_mask is None:
-            src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
-        
-        encoder_output = self.encoder(src, src_mask)
-        output = self.output_layer(encoder_output)
-        
-        return output
-        
-    
-    def generate_mask(self, dim1, dim2):
-        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
-
-
-class TransformerDecoderPos(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
-        super(TransformerDecoderPos, self).__init__()
-        self.seq_len = seq_len
-        self.input_size = input_size
-        self.positional = nn.parameter.Parameter(torch.rand((1, seq_len, 1)))
-        self.encode_input_layer = nn.Linear(input_size, d_model)
-        encode_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
-        self.output_layer = nn.Linear(d_model, output_size)
-        
-    def forward(self, src, src_mask=None):
-        src = self.encode_input_layer(src)
-        src_pos = src + self.positional
-        
-        if src_mask is None:
-            src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
-        
-        encoder_output = self.encoder(src_pos, src_mask)
-        output = self.output_layer(encoder_output)
-        
-        return output
-        
-    
-    def generate_mask(self, dim1, dim2):
-        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
-
-
-class TransformerDecoder_v2(nn.Module):
-    def __init__(self, seq_len, num_layer, input_size, output_size, d_model, num_heads, feedforward_dim, dropout=0.1):
-        super(TransformerDecoder_v2, self).__init__()
-        self.seq_len = seq_len
-        self.input_size = input_size
-        self.output_size = output_size
-        encode_layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=num_heads, dim_feedforward=feedforward_dim, dropout=dropout, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encode_layer, num_layer)
-        self.output_layer = nn.Linear(input_size, output_size)
         self.init_weights()
     
     def init_weights(self):
         initrange = 0.1
-        self.output_layer.bias.data.zero_()
-        self.output_layer.weight.data.uniform_(-initrange, initrange)
+        self.encode_input_layer.weight.data.uniform_(-initrange, initrange)
+        self.encode_input_layer.bias.data.zero_()
+    
+    def generate_mask(self, dim1, dim2):
+        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
         
     def forward(self, src, src_mask=None):
+        src = self.encode_input_layer(src)
+        if self.positional is not None:
+            src = self.positional(src)
+        
         if src_mask is None:
             src_mask = self.generate_mask(self.seq_len, self.seq_len).to(src.device)
         
@@ -122,15 +45,11 @@ class TransformerDecoder_v2(nn.Module):
         output = self.output_layer(encoder_output)
         
         return output
-        
-    
-    def generate_mask(self, dim1, dim2):
-        return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
 
-class WeatherLSTM(nn.Module):
+class StockLSTM(nn.Module):
     def __init__(self, input_size, hidden_dim, output_size):
-        super(WeatherLSTM, self).__init__()
+        super(StockLSTM, self).__init__()
         self.hidden_dim = hidden_dim
 
         self.lstm = nn.LSTM(input_size, hidden_dim, batch_first=True)
