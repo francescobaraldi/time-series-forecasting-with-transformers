@@ -18,7 +18,7 @@ model_type = "decoder"
 if model_type == "decoder":
     
     step_type = "singlestep"
-    positional_encoding = "none"
+    positional_encoding = "sinusoidal"
     batch_size = 32
     learning_rate = 0.001
     window_len = 365
@@ -37,12 +37,12 @@ if model_type == "decoder":
     test_fn = test_singlestep
     eval_fn = eval_mae_singlestep
     
-    num_epochs = [50]
-    num_layers = [1, 3, 6]
-    d_models = [32, 128, 256]
-    num_heads = [1, 4, 8]
-    dropouts = [0, 0.1]
-    feedforward_dims = [128, 256, 512, 1024]
+    num_epochs = [100]
+    num_layers = [1]
+    d_models = [128]
+    num_heads = [8]
+    dropouts = [0]
+    feedforward_dims = [512]
     for num_epoch in num_epochs:
         for num_layer in num_layers:
             for d_model in d_models:
