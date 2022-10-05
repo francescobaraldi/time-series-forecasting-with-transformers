@@ -4,7 +4,7 @@ import torch.optim as optim
 
 from dataset import YahooDataset
 from model import TransformerDecoder
-from eval import eval_mae_singlestep, eval_mae_multistep
+from eval import eval_mae_singlestep, eval_mae_multistep, eval_mape_singlestep, eval_mape_multistep
 from train import train_model_singlestep, train_model_multistep, train_and_test_model
 from test import test_singlestep, test_multistep
 

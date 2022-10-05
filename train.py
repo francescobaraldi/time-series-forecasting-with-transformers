@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from plot import plot_scores
 
 
-def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer):
+def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, scaler=None):
     results = {
         'train_scores': [],
         'test_scores': [],
@@ -12,13 +12,6 @@ def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn
     }
     model = model.to(device)
     for e in tqdm(range(num_epochs)):
-        model.eval()
-        train_score = score_fn(model, train_dl, device)
-        test_score = score_fn(model, test_dl, device)
-        results['train_scores'].append(train_score.cpu())
-        results['test_scores'].append(test_score.cpu())
-        print(f"Epoch {e} - Train score {train_score} - Test score {test_score}")
-        
         model.train()
         avg_loss = 0
         count = 0
@@ -32,31 +25,31 @@ def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn
             loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
             avg_loss += loss.cpu().detach().numpy().item()
             if i % 50 == 0:
-                print(f'loss {loss.cpu().item():.6f}')
+                print(f'\nloss {loss.cpu().item():.6f}')
             loss.backward()
             optimizer.step()
             count += 1
         avg_loss /= count
         results['losses'].append(avg_loss)
+        
+        model.eval()
+        train_score, score_name = score_fn(model, train_dl, device, scaler)
+        test_score, _ = score_fn(model, test_dl, device, scaler)
+        results['train_scores'].append(train_score.cpu())
+        results['test_scores'].append(test_score.cpu())
+        print(f"\nEpoch {e} - Train score {train_score} - Test score {test_score}")
     
-    return model, results
+    return model, results, score_name
 
 
-def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer):
+def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, scaler=None):
     results = {
         'train_scores': [],
         'test_scores': [],
         'losses': [],
     }
     model = model.to(device)
-    for e in tqdm(range(num_epochs)):
-        model.eval()
-        train_score = score_fn(model, train_dl, device)
-        test_score = score_fn(model, test_dl, device)
-        results['train_scores'].append(train_score.cpu())
-        results['test_scores'].append(test_score.cpu())
-        print(f"Epoch {e} - Train score {train_score} - Test score {test_score}")
-        
+    for e in tqdm(range(num_epochs)):        
         model.train()
         avg_loss = 0
         count = 0
@@ -69,14 +62,21 @@ def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn,
             loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
             avg_loss += loss.cpu().detach().numpy().item()
             if i % 50 == 0:
-                print(f'loss {loss.cpu().item():.6f}')
+                print(f'\nloss {loss.cpu().item():.6f}')
             loss.backward()
             optimizer.step()
             count += 1
         avg_loss /= count
         results['losses'].append(avg_loss)
+        
+        model.eval()
+        train_score, score_name = score_fn(model, train_dl, device, scaler)
+        test_score, _ = score_fn(model, test_dl, device, scaler)
+        results['train_scores'].append(train_score.cpu())
+        results['test_scores'].append(test_score.cpu())
+        print(f"\nEpoch {e} - Train score {train_score} - Test score {test_score}")
     
-    return model, results
+    return model, results, score_name
 
 
 def train_and_test_model(batch_size, learning_rate, num_epochs, window_len, forecast_len, input_size, output_size, d_model, num_heads,
@@ -94,10 +94,33 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, window_len, fore
     
     optimizer = optim_cls(model.parameters(), lr=learning_rate)
     
-    model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer)
+    model, results, score_name = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, scaler)
+    loss_name = str(loss_fn).lower()
+    if "mse" in loss_name:
+        loss_name = "MSE"
+    elif "l1" in loss_name:
+        loss_name = "MAE"
+    else:
+        loss_name = ""
     
-    plot_scores(results['train_scores'], results['test_scores'], results['losses'], training_results_path + model_type + "/" +
-                step_type + f"/training_results__num_epochs_{num_epochs}_num_layers_{num_layers}_d_model_{d_model}_num_heads_{num_heads}_dropout_{dropout}_feedforward_dim_{feedforward_dim}_positional_encoding_{positional_encoding}.png")
+    filename = f"_num_epochs_{num_epochs}_num_layers_{num_layers}_d_model_{d_model}_num_heads_{num_heads}_dropout_{dropout}_feedforward_dim_{feedforward_dim}_positional_encoding_{positional_encoding}"
     
-    test_fn(device, model, test_dl, forecast_len, scaler, save_path=predictions_path + model_type + "/" + step_type +
-         f"/predictions__num_epochs_{num_epochs}_num_layers_{num_layers}_d_model_{d_model}_num_heads_{num_heads}_dropout_{dropout}_feedforward_dim_{feedforward_dim}_positional_encoding_{positional_encoding}")
+    plot_scores(results['train_scores'], results['test_scores'], results['losses'], loss_name, score_name,
+                training_results_path + model_type + "/" + step_type + f"/training_results_{filename}.png")
+    
+    src_mae, src_mape, trg_mae, trg_mape = test_fn(device, model, test_dl, forecast_len, scaler,
+                                                save_path=predictions_path + model_type + "/" + step_type + f"/predictions_{filename}")
+    
+    best_loss = results['losses'][-1]
+    best_train_score = results['train_scores'][-1]
+    best_test_score = results['test_scores'][-1]
+    with open(training_results_path + model_type + f"/{step_type}/training_results_{filename}.txt", "w") as file:
+        file.write(f"Final loss ({loss_name}) value\t{best_loss}\n")
+        file.write(f"Final train score ({score_name}) value\t{best_train_score}\n")
+        file.write(f"Final test score ({score_name}) value\t{best_test_score}\n")
+    
+    with open(predictions_path + model_type + f"/{step_type}/prediction_results_{filename}.txt", "w") as file:
+        file.write(f"MAE score on source\t{src_mae}\n")
+        file.write(f"MAPE score on source\t{src_mape}\n")
+        file.write(f"MAE score on target\t{trg_mae}\n")
+        file.write(f"MAPE score on target\t{trg_mape}\n")

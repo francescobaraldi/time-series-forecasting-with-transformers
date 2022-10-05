@@ -3,25 +3,26 @@ import torch
 import matplotlib.pyplot as plt
 
 
-def plot_scores(train_scores, test_scores, losses, save_path=None):
+def plot_scores(train_scores, test_scores, losses, loss_name="", score_name="", save_path=None):
     legend = ['Train', 'Test']
     xlabel = 'Epoch'
     num_epochs = len(train_scores)
+    
 
     plt.figure(figsize=(20, 6))
     
     plt.subplot(1, 2, 1)
-    plt.plot(range(1, num_epochs + 1), losses, 'r')
-    plt.title('Loss')
+    plt.plot(range(1, num_epochs + 1), losses, color='r')
+    plt.title('Loss evolution during training')
     plt.xlabel(xlabel)
-    plt.ylabel('Loss')
+    plt.ylabel(f'Loss ({loss_name})')
 
     plt.subplot(1, 2, 2)
     plt.plot(range(1, num_epochs + 1), train_scores, 'g', \
         range(1, num_epochs + 1), test_scores, 'b')
-    plt.title('MAE')
+    plt.title('Score evolution during training')
     plt.xlabel(xlabel)
-    plt.ylabel('MAE')
+    plt.ylabel("Score" if score_name == "" else score_name)
     plt.legend(legend)
     if save_path is None:
         plt.show()
