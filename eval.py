@@ -4,7 +4,7 @@ import torch
 
 def reconstruct(scaler, trg, out):
     for b in range(out.shape[0]):
-        add = np.zeros(out.shape[1], trg.shape[2])
+        add = np.zeros((out.shape[1], trg.shape[2]))
         out_rec = scaler.inverse_transform(out[b, :, :] + add)
         trg_rec = scaler.inverse_transform(trg[b, :, :])
         out[b, :, 0] = torch.from_numpy(out_rec[:, 0])
