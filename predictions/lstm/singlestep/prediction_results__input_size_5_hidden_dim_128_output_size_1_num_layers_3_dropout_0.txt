@@ -1,0 +1,4 @@
+MAE score on source	37.836505729624854
+MAPE score on source	0.012874237918696166
+MAE score on target	83.6087055806865
+MAPE score on target	0.026383856984893945

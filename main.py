@@ -4,7 +4,7 @@ import torch.optim as optim
 from dataset import YahooDataset
 from model import TransformerDecoder, StockLSTM
 from eval import eval_mae_singlestep, eval_mae_multistep, eval_mape_singlestep, eval_mape_multistep
-from train import train_model_singlestep, train_model_multistep, train_and_test_model, train_and_test_model2
+from train import train_model_singlestep, train_model_multistep, train_and_test_model
 from test import test_singlestep, test_multistep
 
 
@@ -61,12 +61,12 @@ if model_type == "transformer_decoder":
                             'dropout': dropout,
                             'positional_encoding': positional_encoding,
                         }
-                        train_and_test_model2(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                              forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                              model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
-                                              test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
-                                              predictions_path=predictions_path, model_type=model_type, step_type=step_type,
-                                              model_args=model_args)
+                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
+                                             forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
+                                             model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
+                                             test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
+                                             predictions_path=predictions_path, model_type=model_type, step_type=step_type,
+                                             model_args=model_args)
 
 elif model_type == "lstm":
     
@@ -107,8 +107,8 @@ elif model_type == "lstm":
                     'num_layers': num_layer,
                     'dropout': dropout
                 }
-                train_and_test_model2(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs, forecast_len=forecast_len,
-                                      train_dataset=train_dataset, test_dataset=test_dataset, model_cls=model_cls, loss_fn=loss_fn,
-                                      optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn, eval_fn=eval_fn,
-                                      training_results_path=training_results_path, predictions_path=predictions_path, model_type=model_type,
-                                      step_type=step_type, model_args=model_args)
+                train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs, forecast_len=forecast_len,
+                                     train_dataset=train_dataset, test_dataset=test_dataset, model_cls=model_cls, loss_fn=loss_fn,
+                                     optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn, eval_fn=eval_fn,
+                                     training_results_path=training_results_path, predictions_path=predictions_path, model_type=model_type,
+                                     step_type=step_type, model_args=model_args)
