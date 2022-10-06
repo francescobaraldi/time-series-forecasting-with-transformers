@@ -11,6 +11,7 @@ from test import test_singlestep, test_multistep
 yahoo_dataset_path = "datasets/yahoo_stock.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
+weights_path = "weights/"
 
 model_type = "transformer_decoder"
 
@@ -23,7 +24,7 @@ if model_type == "transformer_decoder":
     batch_size = 32
     learning_rate = 0.001
     window_len = 365
-    forecast_len = 30
+    forecast_len = 60
     input_size = 5
     output_size = 1
     
@@ -65,8 +66,8 @@ if model_type == "transformer_decoder":
                                              forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
                                              model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
                                              test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
-                                             predictions_path=predictions_path, model_type=model_type, step_type=step_type,
-                                             model_args=model_args)
+                                             predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
+                                             step_type=step_type, model_args=model_args)
 
 elif model_type == "lstm":
     
@@ -76,7 +77,7 @@ elif model_type == "lstm":
     batch_size = 32
     learning_rate = 0.001
     window_len = 365
-    forecast_len = 30
+    forecast_len = 60
     input_size = 5
     output_size = 1
     
@@ -107,8 +108,9 @@ elif model_type == "lstm":
                     'num_layers': num_layer,
                     'dropout': dropout
                 }
-                train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs, forecast_len=forecast_len,
-                                     train_dataset=train_dataset, test_dataset=test_dataset, model_cls=model_cls, loss_fn=loss_fn,
-                                     optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn, eval_fn=eval_fn,
-                                     training_results_path=training_results_path, predictions_path=predictions_path, model_type=model_type,
+                train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
+                                     forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
+                                     model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn,
+                                     eval_fn=eval_fn, training_results_path=training_results_path,
+                                     predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
                                      step_type=step_type, model_args=model_args)
