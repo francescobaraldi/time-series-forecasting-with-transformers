@@ -26,7 +26,7 @@ if model_type == "transformer_decoder":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 60
-    input_size = 5
+    input_size = 1
     output_size = 1
     
     train_rate = 0.5
@@ -81,7 +81,7 @@ elif model_type == "lstm":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 60
-    input_size = 5
+    input_size = 1
     output_size = 1
     
     train_rate = 0.5
