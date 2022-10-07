@@ -36,7 +36,6 @@ def main():
         except:
             print("Error: the value must be integer.")
     
-    
     data = yf.download('SPY').iloc[-365:]
     data = data[['Close', 'High', 'Low', 'Open', 'Volume']].to_numpy()
     scaler = joblib.load(scaler_path)

@@ -9,7 +9,7 @@ from train import train_model_singlestep, train_model_multistep, train_and_test_
 from test import test_singlestep, test_multistep
 
 
-yahoo_dataset_path = "datasets/yahoo_stock.csv"
+yahoo_dataset_path = "datasets/yahoo_sp500.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
