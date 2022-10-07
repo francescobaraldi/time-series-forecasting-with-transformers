@@ -3,7 +3,6 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import torch
 from torch.utils.data import Dataset
-import yfinance as yf
 
 
 class YahooDataset(Dataset):

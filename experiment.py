@@ -29,7 +29,7 @@ if model_type == "transformer_decoder":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.5
+    train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  positional_encoding=positional_encoding, train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
@@ -84,7 +84,7 @@ elif model_type == "lstm":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.5
+    train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  positional_encoding="learnable", train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
