@@ -34,10 +34,10 @@ def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, 
     _, window_len, input_size = src.shape
     src_rec = scaler.inverse_transform(src[0, :, :])
     trg_rec = scaler.inverse_transform(trg[0, :, :])
-    predictions_rec = scaler.inverse_transform(predictions[0, :, :] + torch.zeros((predictions.shape[1], input_size)))
+    predictions_rec = scaler.inverse_transform(predictions[0, :, :])
     src_rec = src_rec[:, class_idx].tolist()
     trg_rec = trg_rec[:, class_idx].tolist()
-    predictions_rec = predictions_rec[:, 0].tolist()
+    predictions_rec = predictions_rec[:, class_idx].tolist()
     
     plt.figure(figsize=(15,6))
     plt.plot(np.arange(1, window_len + 1), src_rec, '-', color='green', label='Source', linewidth=1)

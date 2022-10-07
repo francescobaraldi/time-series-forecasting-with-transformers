@@ -21,7 +21,7 @@ def test_singlestep(device, model, dl, forecast_len, scaler, max_num=40, save_pa
             src = input[:, :-1, :]
             src, trg = src.to(device), trg.to(device)
             _, window_len, input_size = src.shape
-            prediction = torch.zeros((window_len + forecast_len - 1, 1))
+            prediction = torch.zeros((window_len + forecast_len - 1, input_size))
             first = True
             current_src = src
             for i in range(forecast_len):
@@ -32,15 +32,14 @@ def test_singlestep(device, model, dl, forecast_len, scaler, max_num=40, save_pa
                 else:
                     prediction[window_len + i - 1:, :] = out[0, -1, :]
                 
-                new_features = torch.cat((out[0, -1, :], trg[0, -(forecast_len - i), 1:]))
-                current_src = torch.cat((current_src[0:1, 1:, :], new_features.unsqueeze(0).unsqueeze(0)), dim=1)
+                current_src = out
                 
             src_eval = src[0, :, :].clone().cpu()
             trg_eval = trg[0, -forecast_len:, :].clone().cpu()
             prediction_eval = prediction.clone().cpu()
             src_eval = scaler.inverse_transform(src_eval)[:, class_idx]
             trg_eval = scaler.inverse_transform(trg_eval)[:, class_idx]
-            prediction_eval = scaler.inverse_transform(prediction_eval + torch.zeros((window_len + forecast_len - 1, input_size)))[:, class_idx]
+            prediction_eval = scaler.inverse_transform(prediction_eval)[:, class_idx]
             src_eval = torch.from_numpy(src_eval)
             trg_eval = torch.from_numpy(trg_eval)
             prediction_eval = torch.from_numpy(prediction_eval)

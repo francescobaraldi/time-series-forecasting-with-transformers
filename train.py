@@ -30,7 +30,7 @@ def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)
-            loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
+            loss = loss_fn(out, trg)
             avg_loss += loss.cpu().detach().numpy().item()
             if i % 50 == 0:
                 print(f'\nloss {loss.cpu().item():.6f}')
@@ -67,7 +67,7 @@ def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn,
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)
-            loss = loss_fn(out, trg[:, :, class_idx].unsqueeze(-1))
+            loss = loss_fn(out, trg)
             avg_loss += loss.cpu().detach().numpy().item()
             if i % 50 == 0:
                 print(f'\nloss {loss.cpu().item():.6f}')
