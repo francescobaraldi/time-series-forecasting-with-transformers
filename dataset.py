@@ -20,7 +20,7 @@ class YahooDataset(Dataset):
             dataset['Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
             dataset = dataset[['Close', 'Day sin', 'Day cos', 'Year sin', 'Year cos']]
         else:
-            dataset = dataset[['Close', 'High', 'Low', 'Open', 'Volume']]
+            dataset = dataset[['Close']]
         class_idx = 0
         return dataset, class_idx
     

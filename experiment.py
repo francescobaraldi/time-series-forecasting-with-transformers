@@ -26,8 +26,8 @@ if model_type == "transformer_decoder":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 5
-    output_size = 5
+    input_size = 1
+    output_size = 1
     
     train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
@@ -76,13 +76,13 @@ elif model_type == "lstm":
     
     step_type = "singlestep"
     
-    num_epochs = 100
+    num_epochs = 1
     batch_size = 32
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 5
-    output_size = 5
+    input_size = 1
+    output_size = 1
     
     train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,

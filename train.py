@@ -115,7 +115,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     plot_scores(results['train_scores'], results['test_scores'], results['losses'], loss_name, score_name,
                 training_results_path + model_type + "/" + step_type + f"/training_results_{filename}.png")
     
-    src_mae, src_mape, trg_mae, trg_mape = test_fn(device, model, test_dl, forecast_len, scaler,
+    src_mae, src_mape, trg_mae, trg_mape = test_fn(device, model, test_dl, forecast_len, scaler, max_num=1,
                                                 save_path=predictions_path + model_type + "/" + step_type + f"/predictions_{filename}")
     
     best_loss = results['losses'][-1]
