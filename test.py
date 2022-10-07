@@ -2,7 +2,7 @@ import torch
 from plot import plot_predictions
 
 
-def test_singlestep(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
+def test_singlestep(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
@@ -59,7 +59,7 @@ def test_singlestep(device, model, dl, forecast_len, scaler, max_num=40, save_pa
         return src_mae, src_mape, trg_mae, trg_mape
 
 
-def test_multistep(device, model, dl, forecast_len, scaler, max_num=40, save_path=None):
+def test_multistep(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
