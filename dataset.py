@@ -31,7 +31,7 @@ class YahooDataset(Dataset):
         else:
             return dataset[int(n * train_rate):]
     
-    def __init__(self, dataset_path, window_len, forecast_len=1, positional_encoding="none", train=True, train_rate=0.5, scaler=None):
+    def __init__(self, dataset_path, window_len, forecast_len=1, positional_encoding="none", train=True, train_rate=0.7, scaler=None):
         super().__init__()
         
         if positional_encoding != "none" and positional_encoding != "sinusoidal" and positional_encoding != "learnable":
