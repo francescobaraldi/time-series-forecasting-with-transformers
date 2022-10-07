@@ -21,7 +21,7 @@ if model_type == "transformer_decoder":
     step_type = "singlestep"
     positional_encoding = "sinusoidal"
     
-    num_epochs = 100
+    num_epochs = 1
     batch_size = 32
     learning_rate = 0.001
     window_len = 365

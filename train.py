@@ -45,7 +45,7 @@ def train_model_singlestep(device, model, train_dl, test_dl, num_epochs, loss_fn
         test_score, _ = score_fn(model, test_dl, device, scaler)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
-        print(f"\nEpoch {e} - Train score {train_score} - Test score {test_score}")
+        print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
     
     return model, results, score_name
 
@@ -82,7 +82,7 @@ def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn,
         test_score, _ = score_fn(model, test_dl, device, scaler)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
-        print(f"\nEpoch {e} - Train score {train_score} - Test score {test_score}")
+        print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
     
     return model, results, score_name
 
@@ -100,7 +100,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     
     optimizer = optim_cls(model.parameters(), lr=learning_rate)
     
-    model, results, score_name = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, scaler)
+    model, results, score_name = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer)
     loss_name = str(loss_fn).lower()
     if "mse" in loss_name:
         loss_name = "MSE"
