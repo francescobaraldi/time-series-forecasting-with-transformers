@@ -2,7 +2,7 @@ import torch
 from plot import plot_predictions
 
 
-def test_singlestep(device, model, dl, forecast_len, scaler, max_num=50, save_path=None, prediction_type=1):
+def test_singlestep(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
@@ -32,10 +32,7 @@ def test_singlestep(device, model, dl, forecast_len, scaler, max_num=50, save_pa
                 else:
                     prediction[window_len + i - 1:, :] = out[0, -1, :]
                 
-                if prediction_type == 1:
-                    current_src = out
-                else:
-                    current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
+                current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
                 
             src_eval = src[0, :, :].clone().cpu()
             trg_eval = trg[0, -forecast_len:, :].clone().cpu()

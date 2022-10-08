@@ -89,7 +89,7 @@ def train_model_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn,
 
 def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, train_dataset,
                           test_dataset, model_cls, loss_fn, optim_cls, train_fn, test_fn, eval_fn, training_results_path,
-                          predictions_path, weights_path, model_type, step_type, model_args, prediction_type):
+                          predictions_path, weights_path, model_type, step_type, model_args):
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     scaler = train_dataset.get_scaler()
@@ -116,7 +116,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
                 training_results_path + model_type + "/" + step_type + f"/training_results_{filename}.png")
     
     src_mae, src_mape, trg_mae, trg_mape = test_fn(device, model, test_dl, forecast_len, scaler,
-                                                save_path=predictions_path + model_type + "/" + step_type + f"/predictions_{filename}", prediction_type=prediction_type)
+                                                save_path=predictions_path + model_type + "/" + step_type + f"/predictions_{filename}")
     
     best_loss = results['losses'][-1]
     best_train_score = results['train_scores'][-1]

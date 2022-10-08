@@ -44,7 +44,6 @@ if model_type == "transformer_decoder":
     train_fn = train_model_singlestep
     test_fn = test_singlestep
     eval_fn = eval_mae_singlestep
-    prediction_type = 1
     
     num_layers = [1]
     d_models = [128]
@@ -72,7 +71,7 @@ if model_type == "transformer_decoder":
                                              model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
                                              test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
                                              predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
-                                             step_type=step_type, model_args=model_args, prediction_type=prediction_type)
+                                             step_type=step_type, model_args=model_args)
 
 elif model_type == "lstm":
     
