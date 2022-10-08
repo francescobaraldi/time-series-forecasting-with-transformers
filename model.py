@@ -11,11 +11,14 @@ class TransformerDecoder(nn.Module):
         if positional_encoding == "sinusoidal":
             self.positional = SinusoidalPositionalEncoder(seq_len=window_len, d_model=d_model, dropout=dropout)
         elif positional_encoding == "learnable":
-            self.positional = LearnablePositionalEncoder(seq_len=window_len, d_model=d_model, dropout=dropout)
+            # self.positional = LearnablePositionalEncoder(seq_len=window_len, d_model=d_model, dropout=dropout)
+            self.positional = nn.parameter.Parameter(torch.zeros((1, window_len, d_model)))
+            self.positional_dropout = nn.Dropout(p=dropout)
         elif positional_encoding == "none":
             self.positional = None
         else:
             raise Exception("Positional encoding type not recognized: use 'none', 'sinusoidal' or 'learnable'.")
+        self.positional_encoding = positional_encoding
         
         self.window_len = window_len
         self.encode_input_layer = nn.Linear(input_size, d_model)
@@ -36,7 +39,10 @@ class TransformerDecoder(nn.Module):
     def forward(self, src, src_mask=None):
         src = self.encode_input_layer(src)
         if self.positional is not None:
-            src = self.positional(src)
+            if self.positional_encoding == "learnable":
+                src = self.positional_dropout(src + self.positional)
+            else:
+                src = self.positional(src)
         
         if src_mask is None:
             src_mask = self.generate_mask(self.window_len, self.window_len).to(src.device)

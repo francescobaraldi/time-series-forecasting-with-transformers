@@ -26,16 +26,17 @@ if model_type == "transformer_decoder":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 1
-    output_size = 1
+    input_size = 5
+    output_size = 5
     
     train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 positional_encoding=positional_encoding, train=True, train_rate=train_rate)
+                                 input_size=input_size, positional_encoding=positional_encoding, train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                positional_encoding=positional_encoding, train=False, train_rate=train_rate, scaler=scaler)
+                                input_size=input_size, positional_encoding=positional_encoding, train=False, train_rate=train_rate,
+                                scaler=scaler)
     
     model_cls = TransformerDecoder
     loss_fn = nn.MSELoss()
@@ -81,16 +82,17 @@ elif model_type == "lstm":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 1
-    output_size = 1
+    input_size = 5
+    output_size = 5
     
     train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 positional_encoding="learnable", train=True, train_rate=train_rate)
+                                 input_size=input_size, positional_encoding="learnable", train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                positional_encoding="learnable", train=False, train_rate=train_rate, scaler=scaler)
+                                input_size=input_size, positional_encoding="learnable", train=False, train_rate=train_rate,
+                                scaler=scaler)
     
     model_cls = StockLSTM
     loss_fn = nn.MSELoss()
