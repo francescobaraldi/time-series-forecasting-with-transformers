@@ -26,8 +26,8 @@ if model_type == "transformer_decoder":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 5
-    output_size = 5
+    input_size = 1
+    output_size = 1
     
     train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
@@ -47,9 +47,9 @@ if model_type == "transformer_decoder":
     
     num_layers = [1]
     d_models = [128]
-    num_heads = [8]
+    num_heads = [4]
     dropouts = [0]
-    feedforward_dims = [512]
+    feedforward_dims = [256]
     for num_layer in num_layers:
         for d_model in d_models:
             for num_head in num_heads:
@@ -82,8 +82,8 @@ elif model_type == "lstm":
     learning_rate = 0.001
     window_len = 365
     forecast_len = 30
-    input_size = 5
-    output_size = 5
+    input_size = 1
+    output_size = 1
     
     train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
