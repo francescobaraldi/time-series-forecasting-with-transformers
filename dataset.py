@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 
 class YahooDataset(Dataset):
-    def prepare_dataset(self, dataset_path, positional_encoding, input_size):
+    def prepare_dataset(self, dataset_path, positional_encoding):
         dataset = pd.read_csv(dataset_path)
         
         if positional_encoding == "none":
@@ -20,10 +20,7 @@ class YahooDataset(Dataset):
             dataset['Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
             dataset = dataset[['Close', 'Day sin', 'Day cos', 'Year sin', 'Year cos']]
         else:
-            if input_size == 1:
-                dataset = dataset[['Close']]
-            else:
-                dataset = dataset[['Close', 'High', 'Low', 'Open', 'Volume']]
+            dataset = dataset[['Close']]
         class_idx = 0
         return dataset, class_idx
     
@@ -34,17 +31,13 @@ class YahooDataset(Dataset):
         else:
             return dataset[int(n * train_rate):]
     
-    def __init__(self, dataset_path, window_len, forecast_len=1, input_size=1, positional_encoding="none", train=True, train_rate=0.7, scaler=None):
+    def __init__(self, dataset_path, window_len, forecast_len=1, positional_encoding="none", train=True, train_rate=0.7, scaler=None):
         super().__init__()
         
         if positional_encoding != "none" and positional_encoding != "sinusoidal" and positional_encoding != "learnable":
             raise Exception("Positional encoding type not recognized: use 'none', 'sinusoidal' or 'learnable'.")
         
-        if input_size != 1 and input_size != 5:
-            raise Exception("Input size must be either 1 or 5.")
-        self.input_size = input_size
-        
-        dataset, class_idx = self.prepare_dataset(dataset_path, positional_encoding, input_size)
+        dataset, class_idx = self.prepare_dataset(dataset_path, positional_encoding)
         self.class_idx = class_idx
         self.forecast_len = forecast_len
         self.dataset = self.split_dataset(dataset, train, train_rate).to_numpy()

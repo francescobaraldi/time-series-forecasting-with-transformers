@@ -21,7 +21,7 @@ if model_type == "transformer_decoder":
     step_type = "singlestep"
     positional_encoding = "sinusoidal"
     
-    num_epochs = 1
+    num_epochs = 400
     batch_size = 32
     learning_rate = 0.0001
     window_len = 365
@@ -31,11 +31,11 @@ if model_type == "transformer_decoder":
     
     train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 input_size=input_size, positional_encoding=positional_encoding, train=True, train_rate=train_rate)
+                                 positional_encoding=positional_encoding, train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                input_size=input_size, positional_encoding=positional_encoding, train=False, train_rate=train_rate,
+                                positional_encoding=positional_encoding, train=False, train_rate=train_rate,
                                 scaler=scaler)
     
     model_cls = TransformerDecoder
@@ -77,9 +77,9 @@ elif model_type == "lstm":
     
     step_type = "singlestep"
     
-    num_epochs = 1
+    num_epochs = 400
     batch_size = 32
-    learning_rate = 0.001
+    learning_rate = 0.0001
     window_len = 365
     forecast_len = 30
     input_size = 1
@@ -87,11 +87,11 @@ elif model_type == "lstm":
     
     train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 input_size=input_size, positional_encoding="learnable", train=True, train_rate=train_rate)
+                                 positional_encoding="learnable", train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                input_size=input_size, positional_encoding="learnable", train=False, train_rate=train_rate,
+                                positional_encoding="learnable", train=False, train_rate=train_rate,
                                 scaler=scaler)
     
     model_cls = StockLSTM
