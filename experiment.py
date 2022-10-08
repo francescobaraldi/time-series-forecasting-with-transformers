@@ -23,7 +23,7 @@ if model_type == "transformer_decoder":
     
     num_epochs = 1
     batch_size = 32
-    learning_rate = 0.001
+    learning_rate = 0.0001
     window_len = 365
     forecast_len = 30
     input_size = 1
