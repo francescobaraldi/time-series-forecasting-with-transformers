@@ -9,7 +9,7 @@ from train import train_model_singlestep, train_model_multistep, train_and_test_
 from test import test_singlestep, test_multistep
 
 
-yahoo_dataset_path = "datasets/yahoo_sp500.csv"
+yahoo_dataset_path = "datasets/yahoo_stock.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
@@ -29,7 +29,7 @@ if model_type == "transformer_decoder":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.7
+    train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  input_size=input_size, positional_encoding=positional_encoding, train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
@@ -47,7 +47,7 @@ if model_type == "transformer_decoder":
     
     num_layers = [1]
     d_models = [128]
-    num_heads = [4]
+    num_heads = [8]
     dropouts = [0]
     feedforward_dims = [256]
     for num_layer in num_layers:
@@ -85,7 +85,7 @@ elif model_type == "lstm":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.7
+    train_rate = 0.5
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  input_size=input_size, positional_encoding="learnable", train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
