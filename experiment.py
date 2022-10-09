@@ -9,7 +9,7 @@ from train import train_model_singlestep, train_model_multistep, train_and_test_
 from test import test_singlestep, test_multistep
 
 
-yahoo_dataset_path = "datasets/yahoo_stock.csv"
+yahoo_dataset_path = "datasets/yahoo_sp500.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
@@ -21,8 +21,8 @@ if model_type == "transformer_decoder":
     step_type = "singlestep"
     positional_encoding = "sinusoidal"
     
-    num_epochs = 400
-    batch_size = 32
+    num_epochs = 200
+    batch_size = 64
     learning_rate = 0.0001
     window_len = 365
     forecast_len = 30
@@ -77,8 +77,8 @@ elif model_type == "lstm":
     
     step_type = "singlestep"
     
-    num_epochs = 400
-    batch_size = 32
+    num_epochs = 200
+    batch_size = 64
     learning_rate = 0.0001
     window_len = 365
     forecast_len = 30
