@@ -1,4 +1,3 @@
-from black import out
 import torch
 import torch.nn as nn
 from positional_encoding import SinusoidalPositionalEncoder, LearnablePositionalEncoder
