@@ -90,7 +90,7 @@ def test_multistep(device, model, dl, forecast_len, scaler, max_num=50, save_pat
             trg_mae += torch.mean(torch.abs(trg_eval - prediction_eval[:, -forecast_len:, :]))
             trg_mape += torch.mean(torch.abs((trg_eval - prediction_eval[:, -forecast_len:, :]) / trg_eval))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), out[0:1, :, :].cpu(), scaler,
+            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, -forecast_len:, :].cpu(), out[0:1, :, :].cpu(), scaler,
                              forecast_len, class_idx, j, save_path)
         
         src_mae /= count
