@@ -44,6 +44,8 @@ def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, 
     plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), trg_rec, '-', color='blue', label='Target', linewidth=1)
     if predictions.shape[1] == window_len:
         plt.plot(np.arange(forecast_len + 1, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
+    elif predictions.shape[1] == forecast_len:
+        plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
     else:
         plt.plot(np.arange(2, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
     plt.xlabel("Days")
