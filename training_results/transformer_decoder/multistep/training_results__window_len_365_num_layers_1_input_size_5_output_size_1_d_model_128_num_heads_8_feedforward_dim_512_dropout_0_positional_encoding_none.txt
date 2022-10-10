@@ -1,3 +1,0 @@
-Final loss (MSE) value	0.0004029150259157177
-Final train score (MAE) value	15.00914192199707
-Final test score (MAE) value	330.6892395019531
