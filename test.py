@@ -101,7 +101,7 @@ def test_multistep(device, model, dl, forecast_len, scaler, max_num=50, save_pat
         return src_mae, src_mape, trg_mae, trg_mape
 
 
-def test_std(device, model, dl, forecast_len, scaler, max_num=1, save_path=None):
+def test_std(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
