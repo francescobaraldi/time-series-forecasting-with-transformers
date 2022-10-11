@@ -60,16 +60,18 @@ def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, 
 
 
 def plot_inference(src, predictions, scaler, forecast_len, class_idx, save_path=None):
-    _, window_len, input_size = src.shape
-    src_rec = scaler.inverse_transform(src[0, :, :])
-    predictions_rec = scaler.inverse_transform(predictions[0, :, :] + torch.zeros((predictions.shape[1], input_size)))
+    window_len, input_size = src.shape
+    src_rec = scaler.inverse_transform(src)
+    predictions_rec = scaler.inverse_transform(predictions)
     src_rec = src_rec[:, class_idx].tolist()
-    predictions_rec = predictions_rec[:, 0].tolist()
+    predictions_rec = predictions_rec[:, class_idx].tolist()
     
     plt.figure(figsize=(15,6))
     plt.plot(np.arange(1, window_len + 1), src_rec, '-', color='green', label='Source', linewidth=1)
     if predictions.shape[1] == window_len:
         plt.plot(np.arange(forecast_len + 1, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
+    elif predictions.shape[1] == forecast_len:
+        plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
     else:
         plt.plot(np.arange(2, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
     plt.xlabel("Days")
