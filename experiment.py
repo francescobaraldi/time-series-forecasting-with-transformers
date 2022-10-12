@@ -23,13 +23,13 @@ if model_type == "transformer_decoder":
     
     num_epochs = 200
     batch_size = 64
-    learning_rate = 0.0001
-    window_len = 365
+    learning_rate = 0.00001
+    window_len = 90
     forecast_len = 30
     input_size = 1
     output_size = 1
     
-    train_rate = 0.5
+    train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  positional_encoding=positional_encoding, train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
@@ -136,13 +136,13 @@ elif model_type == "lstm":
     
     num_epochs = 200
     batch_size = 64
-    learning_rate = 0.0001
-    window_len = 365
+    learning_rate = 0.00001
+    window_len = 90
     forecast_len = 30
     input_size = 1
     output_size = 1
     
-    train_rate = 0.5
+    train_rate = 0.7
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
                                  positional_encoding="learnable", train=True, train_rate=train_rate)
     scaler = train_dataset.get_scaler()
