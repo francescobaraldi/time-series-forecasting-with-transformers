@@ -88,7 +88,7 @@ def eval_lstm(model, dl, device, eval_name="mae", scaler=None):
             _, n, _ = input.shape
             forecast_len = n - window_len
             src = input[:, :window_len, :]
-            trg = input[:, -forecast_len:, :]
+            trg = input[:, -1:, :]
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:

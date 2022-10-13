@@ -110,7 +110,7 @@ def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, 
             _, n, _ = input.shape
             forecast_len = n - window_len
             src = input[:, :window_len, :]
-            trg = input[:, -forecast_len:, :]
+            trg = input[:, -1:, :]
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)

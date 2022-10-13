@@ -122,5 +122,5 @@ class StockLSTM(nn.Module):
 
     def forward(self, x):
         output, _ = self.lstm(x)
-        output = self.net(output[:, -self.forecast_len:, :])
+        output = self.net(output[:, -1:, :])
         return output
