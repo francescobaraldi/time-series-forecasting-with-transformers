@@ -55,17 +55,17 @@ def main():
     
     # TODO
     
-    # print("Forecasting the SP500 index closing price for the next 30 days...")
+    print("Forecasting the SP500 index closing price for the next 30 days...")
     
-    # n = window_len + forecast_len - 1
-    # data = yf.download('SPY').iloc[-n:]
-    # data = data[['Close']].to_numpy()
-    # scaler = joblib.load(scaler_path)
-    # data_scaled = scaler.transform(data)
-    # input = torch.from_numpy(data_scaled).unsqueeze(0)
-    # inference(device=device, model=model, input=input, window_len=window_len, forecast_len=forecast_len, scaler=scaler,
-    #           save_path=inference_path)
-    # print(f"The prediction has been saved correctly in folder {inference_path}.")
+    n = window_len + forecast_len - 1
+    data = yf.download('SPY').iloc[-n:]
+    data = data[['Close']].to_numpy()
+    scaler = joblib.load(scaler_path)
+    data_scaled = scaler.transform(data)
+    input = torch.from_numpy(data_scaled).unsqueeze(0)
+    inference(device=device, model=model, input=input, window_len=window_len, forecast_len=forecast_len, scaler=scaler,
+              save_path=inference_path)
+    print(f"The prediction has been saved correctly in folder {inference_path}.")
 
 
 if __name__ == "__main__":
