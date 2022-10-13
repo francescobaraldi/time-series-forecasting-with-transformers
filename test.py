@@ -2,58 +2,46 @@ import torch
 from plot import plot_predictions
 
 
-def test(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
+def test_transformer_decoder(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
     with torch.no_grad():
-        src_mae = 0
-        src_mape = 0
-        trg_mae = 0
-        trg_mape = 0
+        mae = 0
+        mape = 0
         count = 0
-        for j, (input, trg, class_idx) in enumerate(dl):
+        for j, (input, window_len, class_idx) in enumerate(dl):
             if j >= max_num:
                 break
             
             count += 1
+            window_len = window_len[0].item()
             class_idx = class_idx[0].item()
-            src = input[:, :-1, :]
+            src = input[:, :window_len, :]
+            trg = input[:, -forecast_len:, :]
             src, trg = src.to(device), trg.to(device)
-            batch_size, window_len, input_size = src.shape
-            prediction = torch.zeros((batch_size, window_len + forecast_len - 1, input_size))
-            first = True
+            batch_size, _, input_size = src.shape
+            prediction = torch.zeros((batch_size, forecast_len, input_size))
             current_src = src
             for i in range(forecast_len):
                 out = model(current_src)
-                if first:
-                    prediction[:, :window_len, :] = out
-                    first = False
-                else:
-                    prediction[:, window_len + i - 1:, :] = out[:, -1:, :]
+                prediction[:, i, :] = out[:, -1, :]
                 
                 current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
                 
-            src_eval = src.clone().cpu()
-            trg_eval = trg[:, -forecast_len:, :].clone().cpu()
-            prediction_eval = prediction.clone().cpu()
-            src_mae += torch.mean(torch.abs(src_eval[:, 1:, :] - prediction_eval[:, :window_len - 1, :]))
-            src_mape += torch.mean(torch.abs((src_eval[:, 1:, :] - prediction_eval[:, :window_len - 1, :]) / src_eval[:, 1:, :]))
-            trg_mae += torch.mean(torch.abs(trg_eval - prediction_eval[:, -forecast_len:, :]))
-            trg_mape += torch.mean(torch.abs((trg_eval - prediction_eval[:, -forecast_len:, :]) / trg_eval))
+            mae += torch.mean(torch.abs(trg - prediction))
+            mape += torch.mean(torch.abs((trg - prediction) / trg))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, -forecast_len:, :].cpu(), prediction[0:1, :, :].cpu(), scaler,
-                              forecast_len, class_idx, j, save_path)
+            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx,
+                             j, save_path)
         
-        src_mae /= count
-        src_mape /= count
-        trg_mae /= count
-        trg_mape /= count
-        
-        return src_mae, src_mape, trg_mae, trg_mape
+        mae /= count
+        mape /= count
+    
+        return mae, mape
 
 
-def test_std(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
+def test_transformer(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
     
@@ -74,14 +62,43 @@ def test_std(device, model, dl, forecast_len, scaler, max_num=50, save_path=None
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
             
-            trg_y_eval = trg_y.clone().cpu()
-            prediction_eval = out.clone().cpu()
+            mae += torch.mean(torch.abs(trg_y - out))
+            mape += torch.mean(torch.abs((trg_y - out) / trg_y))
             
-            mae += torch.mean(torch.abs(trg_y_eval - prediction_eval))
-            mape += torch.mean(torch.abs((trg_y_eval - prediction_eval) / trg_y_eval))
+            plot_predictions(src[0:1, :, :].cpu(), trg_y[0:1, :, :].cpu(), out[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
+                             save_path)
+        
+        mae /= count
+        mape /= count
+        
+        return mae, mape
+
+
+def test_lstm(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
+    model = model.to(device)
+    model.eval()
+    
+    with torch.no_grad():
+        mae = 0
+        mape = 0
+        count = 0
+        for j, (input, window_len, class_idx) in enumerate(dl):
+            if j >= max_num:
+                break
             
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, -forecast_len:, :].cpu(), out[0:1, :, :].cpu(), scaler,
-                             forecast_len, class_idx, j, save_path)
+            count += 1
+            window_len = window_len[0].item()
+            class_idx = class_idx[0].item()
+            src = input[:, :window_len, :]
+            trg = input[:, -forecast_len:, :]
+            src, trg = src.to(device), trg.to(device)
+            out = model(src)
+            
+            mae += torch.mean(torch.abs(trg - out))
+            mape += torch.mean(torch.abs((trg - out) / trg))
+            
+            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), out[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
+                             save_path)
         
         mae /= count
         mape /= count

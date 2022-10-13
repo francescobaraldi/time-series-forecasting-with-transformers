@@ -2,11 +2,11 @@ import torch.nn as nn
 import torch.optim as optim
 import joblib
 
-from dataset import YahooDataset, YahooDatasetStd
-from model import TransformerDecoder, TransformerStd, StockLSTM
-from eval import eval_mae, eval_mae_std, eval_mape, eval_mape_std
-from train import train_model, train_model_std, train_and_test_model, train_and_test_model_std
-from test import test, test_std
+from dataset import YahooDataset
+from model import StockTransformerDecoder, StockTransformer, StockLSTM
+from eval import eval_transformer_decoder, eval_transformer, eval_lstm
+from train import train_transformer_decoder, train_transformer, train_lstm, train_and_test_model
+from test import test_transformer_decoder, test_transformer, test_lstm
 
 
 yahoo_dataset_path = "datasets/yahoo_sp500.csv"
@@ -14,7 +14,28 @@ predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
 
-model_type = "transformer"
+models_dict = {
+    'transformer_decoder': {
+        'model_cls': StockTransformerDecoder,
+        'train_fn': train_transformer_decoder,
+        'test_fn': test_transformer_decoder,
+        'eval_fn': eval_transformer_decoder,
+    },
+    'transformer': {
+        'model_cls': StockTransformer,
+        'train_fn': train_transformer,
+        'test_fn': test_transformer,
+        'eval_fn': eval_transformer,
+    },
+    'lstm': {
+        'model_cls': StockLSTM,
+        'train_fn': train_lstm,
+        'test_fn': test_lstm,
+        'eval_fn': eval_lstm,
+    },
+}
+
+model_type = "lstm"
 
 if model_type == "transformer_decoder":
     
@@ -29,19 +50,17 @@ if model_type == "transformer_decoder":
     output_size = 1
     
     train_rate = 0.7
-    train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 positional_encoding=positional_encoding, train=True, train_rate=train_rate)
+    train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
+                                 train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
-    test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                positional_encoding=positional_encoding, train=False, train_rate=train_rate, scaler=scaler)
+    test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
+                                train_rate=train_rate, scaler=scaler)
     
-    model_cls = TransformerDecoder
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model
-    test_fn = test
-    eval_fn = eval_mae
+    eval_name = "mae"
+    model_dict = models_dict[model_type]
     
     num_layers = [1]
     d_models = [128]
@@ -66,10 +85,11 @@ if model_type == "transformer_decoder":
                         }
                         train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
                                              forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                             model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
-                                             test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
+                                             model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
+                                             train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                                             eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
                                              predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
-                                             model_args=model_args)
+                                             eval_name=eval_name, model_args=model_args)
 
 elif model_type == "transformer":
     
@@ -84,19 +104,17 @@ elif model_type == "transformer":
     output_size = 1
     
     train_rate = 0.7
-    train_dataset = YahooDatasetStd(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                    train_rate=train_rate)
+    train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
+                                 train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
-    test_dataset = YahooDatasetStd(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
-                                   train_rate=train_rate, scaler=scaler)
+    test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
+                                train_rate=train_rate, scaler=scaler)
     
-    model_cls = TransformerStd
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model_std
-    test_fn = test_std
-    eval_fn = eval_mae_std
+    eval_name = "mae"
+    model_dict = models_dict[model_type]
     
     num_layers = [1]
     d_models = [128]
@@ -121,12 +139,13 @@ elif model_type == "transformer":
                             'dropout': dropout,
                             'positional_encoding': positional_encoding,
                         }
-                        train_and_test_model_std(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                                 forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                                 model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
-                                                 test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
-                                                 predictions_path=predictions_path, weights_path=weights_path,
-                                                 model_type=model_type, model_args=model_args)
+                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
+                                             forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
+                                             model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
+                                             train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                                             eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
+                                             predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
+                                             eval_name=eval_name, model_args=model_args)
 
 elif model_type == "lstm":
     
@@ -139,20 +158,17 @@ elif model_type == "lstm":
     output_size = 1
     
     train_rate = 0.7
-    train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                 positional_encoding="learnable", train=True, train_rate=train_rate)
+    train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
+                                 train_rate=train_rate)
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
-    test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                positional_encoding="learnable", train=False, train_rate=train_rate,
-                                scaler=scaler)
+    test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
+                                train_rate=train_rate, scaler=scaler)
     
-    model_cls = StockLSTM
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model
-    test_fn = test
-    eval_fn = eval_mae
+    eval_name = "mae"
+    model_dict = models_dict[model_type]
     
     num_layers = [2]
     hidden_dims = [128]
@@ -161,6 +177,7 @@ elif model_type == "lstm":
         for hidden_dim in hidden_dims:
             for dropout in dropouts:
                 model_args = {
+                    'forecast_len': forecast_len,
                     'input_size': input_size,
                     'hidden_dim': hidden_dim,
                     'output_size': output_size,
@@ -169,8 +186,9 @@ elif model_type == "lstm":
                     'dropout': dropout
                 }
                 train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                     forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                     model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn,
-                                     eval_fn=eval_fn, training_results_path=training_results_path,
-                                     predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
-                                     model_args=model_args)
+                                             forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
+                                             model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
+                                             train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                                             eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
+                                             predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
+                                             eval_name=eval_name, model_args=model_args)
