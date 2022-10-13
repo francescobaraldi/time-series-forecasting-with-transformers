@@ -177,11 +177,9 @@ elif model_type == "lstm":
         for hidden_dim in hidden_dims:
             for dropout in dropouts:
                 model_args = {
-                    'forecast_len': forecast_len,
                     'input_size': input_size,
                     'hidden_dim': hidden_dim,
                     'output_size': output_size,
-                    'input_size': input_size,
                     'num_layers': num_layer,
                     'dropout': dropout
                 }

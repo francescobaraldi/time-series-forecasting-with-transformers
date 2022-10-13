@@ -108,10 +108,9 @@ class StockTransformer(nn.Module):
 
 
 class StockLSTM(nn.Module):
-    def __init__(self, forecast_len, input_size, hidden_dim, output_size, num_layers, dropout=0.1):
+    def __init__(self, input_size, hidden_dim, output_size, num_layers, dropout=0.1):
         super(StockLSTM, self).__init__()
         
-        self.forecast_len = forecast_len
         self.hidden_dim = hidden_dim
         self.lstm = nn.LSTM(input_size, hidden_dim, num_layers=num_layers, dropout=dropout, batch_first=True)
         self.net = nn.Sequential(
