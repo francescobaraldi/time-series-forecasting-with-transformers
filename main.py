@@ -8,7 +8,7 @@ from inference import inference
 
 
 def main():
-    best_model_path = "best_model/best_model_weights.pth"
+    best_model_path = "best_models/best_model_weights.pth"
     scaler_path = "weights/scaler_split_50.gz"
     inference_path = "inference_results/"
     
