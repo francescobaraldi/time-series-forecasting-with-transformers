@@ -4,9 +4,9 @@ import joblib
 
 from dataset import YahooDataset, YahooDatasetStd
 from model import TransformerDecoder, TransformerStd, StockLSTM
-from eval import eval_mae_singlestep, eval_mae_multistep, eval_mape_singlestep, eval_mape_multistep, eval_mae_std
-from train import train_model_singlestep, train_model_multistep, train_model_std, train_and_test_model, train_and_test_model_std
-from test import test_singlestep, test_multistep, test_std
+from eval import eval_mae, eval_mae_std, eval_mape, eval_mape_std
+from train import train_model, train_model_std, train_and_test_model, train_and_test_model_std
+from test import test, test_std
 
 
 yahoo_dataset_path = "datasets/yahoo_sp500.csv"
@@ -18,12 +18,11 @@ model_type = "transformer"
 
 if model_type == "transformer_decoder":
     
-    step_type = "singlestep"
     positional_encoding = "sinusoidal"
     
     num_epochs = 200
     batch_size = 64
-    learning_rate = 0.00001
+    learning_rate = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -35,15 +34,14 @@ if model_type == "transformer_decoder":
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len,
-                                positional_encoding=positional_encoding, train=False, train_rate=train_rate,
-                                scaler=scaler)
+                                positional_encoding=positional_encoding, train=False, train_rate=train_rate, scaler=scaler)
     
     model_cls = TransformerDecoder
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model_singlestep
-    test_fn = test_singlestep
-    eval_fn = eval_mae_singlestep
+    train_fn = train_model
+    test_fn = test
+    eval_fn = eval_mae
     
     num_layers = [1]
     d_models = [128]
@@ -71,7 +69,7 @@ if model_type == "transformer_decoder":
                                              model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn,
                                              test_fn=test_fn, eval_fn=eval_fn, training_results_path=training_results_path,
                                              predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
-                                             step_type=step_type, model_args=model_args)
+                                             model_args=model_args)
 
 elif model_type == "transformer":
     
@@ -79,7 +77,7 @@ elif model_type == "transformer":
     
     num_epochs = 200
     batch_size = 64
-    learning_rate = 0.00001
+    learning_rate = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -132,11 +130,9 @@ elif model_type == "transformer":
 
 elif model_type == "lstm":
     
-    step_type = "singlestep"
-    
     num_epochs = 200
     batch_size = 64
-    learning_rate = 0.00001
+    learning_rate = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -154,9 +150,9 @@ elif model_type == "lstm":
     model_cls = StockLSTM
     loss_fn = nn.MSELoss()
     optim_cls = optim.Adam
-    train_fn = train_model_singlestep
-    test_fn = test_singlestep
-    eval_fn = eval_mae_singlestep
+    train_fn = train_model
+    test_fn = test
+    eval_fn = eval_mae
     
     num_layers = [2]
     hidden_dims = [128]
@@ -177,4 +173,4 @@ elif model_type == "lstm":
                                      model_cls=model_cls, loss_fn=loss_fn, optim_cls=optim_cls, train_fn=train_fn, test_fn=test_fn,
                                      eval_fn=eval_fn, training_results_path=training_results_path,
                                      predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
-                                     step_type=step_type, model_args=model_args)
+                                     model_args=model_args)
