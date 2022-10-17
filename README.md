@@ -51,7 +51,13 @@ After the training each model is tested on the test set with a forecast length o
 To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Percentage Error* is measured.
 
 ## Results
-TODO...
+
+### Training results
+|                   | Transformer Decoder | Transformer | LSTM    |
+| ----------------- | ------------------- | ----------- | ------- |
+| loss value (MSE)  | 0.00010             | 0.00012     | 0.00217 |
+| train score (MAE) | 0.00712             | 0.00768     | 0.03323 |
+| test score (MAE)  | 0.08099             | 0.07480     | 0.27325 |
 
 ## Usage
 
