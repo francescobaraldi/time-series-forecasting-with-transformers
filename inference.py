@@ -25,9 +25,9 @@ def inference_transformer(device, model, input, window_len, forecast_len, scaler
     
     with torch.no_grad():
         _, _, input_size = input.shape
+        input = input.to(device)
         src = input[:, :window_len, :]
         trg = input[:, -forecast_len:, :]
-        src, trg = src.to(device), trg.to(device)
         prediction = torch.zeros((forecast_len, input_size)).to(device)
         current_src = src
         current_trg = trg

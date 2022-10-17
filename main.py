@@ -67,7 +67,7 @@ def main():
     inference_transformer_decoder(device=device, model=transformer_decoder, src=src, forecast_len=forecast_len, scaler=scaler,
                                   save_path=inference_path + "prediction_transformer_decoder.png")
     
-    print(f"The prediction of the transformer decoder model has been saved correctly in folder {inference_path}.")
+    print(f"The prediction of the transformer decoder model has been saved correctly in folder {inference_path}")
     
     
     print("Forecasting the SP500 index closing price for the next 30 days with transformer model...")
@@ -81,7 +81,7 @@ def main():
     inference_transformer(device=device, model=transformer, input=input, window_len=window_len, forecast_len=forecast_len,
                           scaler=scaler, save_path=inference_path + "prediction_transformer.png")
     
-    print(f"The prediction of the transformer model has been saved correctly in folder {inference_path}.")
+    print(f"The prediction of the transformer model has been saved correctly in folder {inference_path}")
     
     
     print("Forecasting the SP500 index closing price for the next 30 days with lstm model...")
@@ -94,7 +94,7 @@ def main():
     inference_lstm(device=device, model=lstm, src=src, forecast_len=forecast_len, scaler=scaler,
                    save_path=inference_path + "prediction_lstm.png")
     
-    print(f"The prediction of the lstm model has been saved correctly in folder {inference_path}.")
+    print(f"The prediction of the lstm model has been saved correctly in folder {inference_path}")
 
 
 if __name__ == "__main__":
