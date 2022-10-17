@@ -54,10 +54,16 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 
 ### Training results
 |                   | Transformer Decoder | Transformer | LSTM    |
-| ----------------- | ------------------- | ----------- | ------- |
+|:-----------------:|:-------------------:|:-----------:|:-------:|
 | loss value (MSE)  | 0.00010             | 0.00012     | 0.00217 |
 | train score (MAE) | 0.00712             | 0.00768     | 0.03323 |
 | test score (MAE)  | 0.08099             | 0.07480     | 0.27325 |
+
+### Testing results
+|            | Transformer Decoder | Transformer | LSTM    |
+|:----------:|:-------------------:|:-----------:|:-------:|
+| MAE score  | 0.34848             | 0.07524     | 0.49090 |
+| MAPE score | 0.15952             | 0.03263     | 0.31760 |
 
 ## Usage
 
