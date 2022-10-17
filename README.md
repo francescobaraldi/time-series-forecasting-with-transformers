@@ -12,6 +12,41 @@ The project has been developed as part of the course "School in AI: Deep Learnin
 
 The dataset used is taken by Yahoo Finance and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 29-01-1993 to 06-10-2022. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
 
+## Training
+In the ```experiment.py``` file the training has been performed, for each model a set of values for each hyper parameter has been tested together and the results of the training is saved in the specific directories.
+For each model:
+- batch size = 64;
+- input time series length = 90;
+- trainset split = 70 %
+- testset split = 30 %
+- loss function = mean squared error
+- optimizer = Adam
+
+### Transformer decoder
+- learning rate = 1e-05
+- number of decoders = 1
+- dimension of the model (feature size) = 128
+- number of heads = 8
+- dropout = 0
+- dimension of the fully connected inside the decoder = 256
+- positional encoding = classical sinusoidal encoding
+### Transformer
+- output time series length = 30
+- learning rate = 1e-05
+- number of encoders = 1
+- number of decoders = 1
+- dimension of the model (feature size) = 128
+- number of heads = 8
+- dropout = 0
+- dimension of the fully connected inside the decoder = 256
+- positional encoding = classical sinusoidal encoding
+
+### LSTM
+- learning rate = 1e-05
+- number of layers = 2
+- dimension of the hidden states = 64
+- dropout = 0
+
 ## Results
 TODO...
 
@@ -25,8 +60,9 @@ Install the dependencies:
 
 Then it is possible to execute the main file which runs the three models tested in order to forecast the next 30 days closing price of the S&P 500 index:
 ```python main.py```
-
 The results will be plotted and saved in the directory ```inference_results/``` in png format, one image for each model tested.
+
+It is also possible to experiment with the models, in the ```experiment.py``` file there is the code to train the models and it's possible to try with different hyper parameters, different lengths of the input time series and output time series. The notebook version of the file allows to run the code in [Google Colab](https://colab.research.google.com/).
 
 ## References
 
