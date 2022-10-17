@@ -59,9 +59,9 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 | train score (MAE) | 0.00712             | 0.00768     | 0.03323 |
 | test score (MAE)  | 0.08099             | **0.07480** | 0.27325 |
 
-![alt text](images/training_transformer_decoder.png?raw=true "Transformer decoder training")
-![alt text](images/training_transformer.png?raw=true "Transformer training")
-![alt text](images/training_lstm.png?raw=true "LSTM training")
+![alt text](images/training_transformer_decoder.png "Transformer decoder training")
+![alt text](images/training_transformer.png "Transformer training")
+![alt text](images/training_lstm.png "LSTM training")
 
 
 ### Testing results
