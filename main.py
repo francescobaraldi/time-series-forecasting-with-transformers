@@ -63,7 +63,7 @@ def main():
     data = data[['Close']].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
-    src = torch.from_numpy(data_scaled).unsqueeze(0)
+    src = torch.from_numpy(data_scaled).float().unsqueeze(0)
     inference_transformer_decoder(device=device, model=transformer_decoder, src=src, forecast_len=forecast_len, scaler=scaler,
                                   save_path=inference_path + "prediction_transformer_decoder.png")
     
@@ -77,7 +77,7 @@ def main():
     data = data[['Close']].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
-    input = torch.from_numpy(data_scaled).unsqueeze(0)
+    input = torch.from_numpy(data_scaled).float().unsqueeze(0)
     inference_transformer(device=device, model=transformer, input=input, window_len=window_len, forecast_len=forecast_len,
                           scaler=scaler, save_path=inference_path + "prediction_transformer.png")
     
@@ -90,7 +90,7 @@ def main():
     data = data[['Close']].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
-    src = torch.from_numpy(data_scaled).unsqueeze(0)
+    src = torch.from_numpy(data_scaled).float().unsqueeze(0)
     inference_lstm(device=device, model=lstm, src=src, forecast_len=forecast_len, scaler=scaler,
                    save_path=inference_path + "prediction_lstm.png")
     

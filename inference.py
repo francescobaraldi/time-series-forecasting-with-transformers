@@ -9,7 +9,7 @@ def inference_transformer_decoder(device, model, src, forecast_len, scaler, save
     with torch.no_grad():
         _, _, input_size = src.shape
         src = src.to(device)
-        prediction = torch.zeros((forecast_len, input_size))
+        prediction = torch.zeros((forecast_len, input_size)).to(device)
         current_src = src
         for i in range(forecast_len):
             out = model(current_src)
@@ -28,7 +28,7 @@ def inference_transformer(device, model, input, window_len, forecast_len, scaler
         src = input[:, :window_len, :]
         trg = input[:, -forecast_len:, :]
         src, trg = src.to(device), trg.to(device)
-        prediction = torch.zeros((forecast_len, input_size))
+        prediction = torch.zeros((forecast_len, input_size)).to(device)
         current_src = src
         current_trg = trg
         for i in range(forecast_len):
