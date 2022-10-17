@@ -13,16 +13,16 @@ The project has been developed as part of the course "School in AI: Deep Learnin
 The dataset used is taken by Yahoo Finance and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 29-01-1993 to 06-10-2022. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
 
 ## Training
-In the ```experiment.py``` file the training has been performed, for each model a set of values for each hyper parameter has been tested together and the results of the training is saved in the specific directories.
+The training is performed in the ```experiment.py``` file, for each model a set of values for each hyper parameter is tested together and the results of the training is saved in the specific directories.
 For each model:
 - batch size = 64;
 - input time series length = 90;
-- trainset split = 70 %
-- testset split = 30 %
+- trainset split = 70%
+- testset split = 30%
 - loss function = mean squared error
 - optimizer = Adam
 
-### Transformer decoder
+### Transformer decoder best values
 - learning rate = 1e-05
 - number of decoders = 1
 - dimension of the model (feature size) = 128
@@ -30,7 +30,7 @@ For each model:
 - dropout = 0
 - dimension of the fully connected inside the decoder = 256
 - positional encoding = classical sinusoidal encoding
-### Transformer
+### Transformer best values
 - output time series length = 30
 - learning rate = 1e-05
 - number of encoders = 1
@@ -41,11 +41,14 @@ For each model:
 - dimension of the fully connected inside the decoder = 256
 - positional encoding = classical sinusoidal encoding
 
-### LSTM
+### LSTM best values
 - learning rate = 1e-05
 - number of layers = 2
 - dimension of the hidden states = 64
 - dropout = 0
+
+After the training each model is tested on the test set with a forecast length of 30 days and the forecast is plotted against the ground truth and saved to file.
+To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Percentage Error* is measured.
 
 ## Results
 TODO...
