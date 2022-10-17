@@ -4,7 +4,7 @@ import joblib
 import yfinance as yf
 
 from model import StockTransformerDecoder, StockTransformer, StockLSTM
-from inference import inference
+from inference import inference_transformer_decoder, inference_transformer, inference_lstm
 
 
 def main():
@@ -13,9 +13,11 @@ def main():
     inference_path = "inference_results/"
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    window_len = 90
+    forecast_len = 30
     
     transformer_decoder_args = {
-        'window_len': 90,
+        'window_len': window_len,
         'num_layers': 1,
         'input_size': 1,
         'output_size': 1,
@@ -26,8 +28,8 @@ def main():
         'positional_encoding': 'sinusoidal',
     }
     transformer_args = {
-        'window_len': 90,
-        'target_len': 30,
+        'window_len': window_len,
+        'target_len': forecast_len,
         'num_encoder_layers': 1,
         'num_decoder_layers': 1,
         'input_size': 1,
@@ -53,19 +55,46 @@ def main():
     transformer.load_state_dict(torch.load(best_model_path + "best_transformer.pth", map_location=torch.device(device)))
     lstm.load_state_dict(torch.load(best_model_path + "best_lstm.pth", map_location=torch.device(device)))
     
-    # TODO
+    scaler = joblib.load(scaler_path)
     
-    # print("Forecasting the SP500 index closing price for the next 30 days...")
+    print("Forecasting the SP500 index closing price for the next 30 days with transformer decoder model...")
     
-    # n = window_len + forecast_len - 1
-    # data = yf.download('SPY').iloc[-n:]
-    # data = data[['Close']].to_numpy()
-    # scaler = joblib.load(scaler_path)
-    # data_scaled = scaler.transform(data)
-    # input = torch.from_numpy(data_scaled).unsqueeze(0)
-    # inference(device=device, model=model, input=input, window_len=window_len, forecast_len=forecast_len, scaler=scaler,
-    #           save_path=inference_path)
-    # print(f"The prediction has been saved correctly in folder {inference_path}.")
+    data = yf.download('SPY').iloc[-window_len:]
+    data = data[['Close']].to_numpy()
+    scaler = joblib.load(scaler_path)
+    data_scaled = scaler.transform(data)
+    src = torch.from_numpy(data_scaled).unsqueeze(0)
+    inference_transformer_decoder(device=device, model=transformer_decoder, src=src, forecast_len=forecast_len, scaler=scaler,
+                                  save_path=inference_path + "prediction_transformer_decoder.png")
+    
+    print(f"The prediction of the transformer decoder model has been saved correctly in folder {inference_path}.")
+    
+    
+    print("Forecasting the SP500 index closing price for the next 30 days with transformer model...")
+    
+    n = window_len + forecast_len - 1
+    data = yf.download('SPY').iloc[-n:]
+    data = data[['Close']].to_numpy()
+    scaler = joblib.load(scaler_path)
+    data_scaled = scaler.transform(data)
+    input = torch.from_numpy(data_scaled).unsqueeze(0)
+    inference_transformer(device=device, model=transformer, input=input, window_len=window_len, forecast_len=forecast_len,
+                          scaler=scaler, save_path=inference_path + "prediction_transformer.png")
+    
+    print(f"The prediction of the transformer model has been saved correctly in folder {inference_path}.")
+    
+    
+    print("Forecasting the SP500 index closing price for the next 30 days with lstm model...")
+    
+    data = yf.download('SPY').iloc[-window_len:]
+    data = data[['Close']].to_numpy()
+    scaler = joblib.load(scaler_path)
+    data_scaled = scaler.transform(data)
+    src = torch.from_numpy(data_scaled).unsqueeze(0)
+    inference_lstm(device=device, model=lstm, src=src, forecast_len=forecast_len, scaler=scaler,
+                   save_path=inference_path + "prediction_lstm.png")
+    
+    print(f"The prediction of the lstm model has been saved correctly in folder {inference_path}.")
 
 
 if __name__ == "__main__":
