@@ -11,6 +11,7 @@ The project has been developed as part of the course "School in AI: Deep Learnin
 ## Dataset
 
 The dataset used is taken by Yahoo Finance and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 29-01-1993 to 06-10-2022. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
+To normalize the data has been used the min max scaling, fitted on the train set and then applied also to the test set. The evaluation metrics then are computed on the scaled data, while in order to plot the forecasting with the correct values an inverse scaling has been applied before plotting.
 
 ## Training
 The training is performed in the ```experiment.py``` file, for each model a set of values for each hyper parameter is tested together and the results of the training is saved in the specific directories.
@@ -60,8 +61,11 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 | test score (MAE)  | 0.08099             | **0.07480** | 0.27325 |
 
 ![alt text](images/training_transformer_decoder.png "Transformer decoder training")
+*Transformer decoder training*
 ![alt text](images/training_transformer.png "Transformer training")
+*Transformer training*
 ![alt text](images/training_lstm.png "LSTM training")
+*LSTM training*
 
 
 ### Testing results
@@ -69,6 +73,12 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 |:----------:|:-------------------:|:-----------:|:-------:|
 | MAE score  | 0.34848             | **0.07524** | 0.49090 |
 | MAPE score | 0.15952             | **0.03263** | 0.31760 |
+
+The results show that the Transformer model is the best one, with an order of magnitude better performance.
+Some examples of Transformer forecasting from the test set:
+![alt text](images/prediction_transformer_1.png "Transformer forecast example")
+![alt text](images/prediction_transformer_2.png "Transformer forecast example")
+
 
 ## Usage
 
