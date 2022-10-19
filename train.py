@@ -163,7 +163,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     
     mae, mape = test_fn(device, model, test_dl, forecast_len, scaler,
                         save_path=predictions_path + model_type + f"/predictions_{filename}")
-    mae_train, mape_train = test_fn(device, model, test_dl, forecast_len, scaler,
+    mae_train, mape_train = test_fn(device, model, train_dl, forecast_len, scaler,
                         save_path=predictions_path + model_type + f"/train/predictions_{filename}")
     
     final_loss = results['losses'][-1]
