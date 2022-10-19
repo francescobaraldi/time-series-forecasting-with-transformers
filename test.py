@@ -58,7 +58,7 @@ def test_transformer(device, model, dl, forecast_len, scaler, max_num=50, save_p
             class_idx = class_idx[0].item()
             input = input.to(device)
             src = input[:, :window_len, :]
-            trg = input[:, window_len - 1:window_len -1 + forecast_len, :]
+            trg = input[:, window_len - 1:window_len - 1 + forecast_len, :]
             trg_y = input[:, -forecast_len:, :]
             batch_size, _, input_size = src.shape
             prediction = torch.zeros((batch_size, forecast_len, input_size)).to(device)
@@ -74,7 +74,7 @@ def test_transformer(device, model, dl, forecast_len, scaler, max_num=50, save_p
             mae += torch.mean(torch.abs(trg_y - prediction))
             mape += torch.mean(torch.abs((trg_y - prediction) / trg_y))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg_y[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
+            plot_predictions(current_src[0:1, :, :].cpu(), trg_y[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
                              save_path)
         
         mae /= count
