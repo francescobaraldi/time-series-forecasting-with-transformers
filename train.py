@@ -163,6 +163,8 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     
     mae, mape = test_fn(device, model, test_dl, forecast_len, scaler,
                         save_path=predictions_path + model_type + f"/predictions_{filename}")
+    mae_train, mape_train = test_fn(device, model, test_dl, forecast_len, scaler,
+                        save_path=predictions_path + model_type + f"/train/predictions_{filename}")
     
     final_loss = results['losses'][-1]
     final_train_score = results['train_scores'][-1]
@@ -175,47 +177,6 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     with open(predictions_path + model_type + f"/prediction_results_{filename}.txt", "w") as file:
         file.write(f"MAE score on target\t{mae}\n")
         file.write(f"MAPE score on target\t{mape}\n")
-
-
-# def train_and_test_model_std(batch_size, learning_rate, num_epochs, forecast_len, train_dataset,
-#                              test_dataset, model_cls, loss_fn, optim_cls, train_fn, test_fn, eval_fn, training_results_path,
-#                              predictions_path, weights_path, model_type, model_args):
-    
-#     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#     scaler = train_dataset.get_scaler()
-#     train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-#     test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    
-#     model = model_cls(**model_args).to(device)
-    
-#     optimizer = optim_cls(model.parameters(), lr=learning_rate)
-    
-#     model, results, score_name = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer)
-#     loss_name = str(loss_fn).lower()
-#     if "mse" in loss_name:
-#         loss_name = "MSE"
-#     elif "l1" in loss_name:
-#         loss_name = "MAE"
-#     else:
-#         loss_name = ""
-    
-#     filename = get_filename(model_args)
-#     torch.save(model.state_dict(), f"{weights_path}{model_type}/weights_{filename}.pth")
-    
-#     plot_scores(results['train_scores'], results['test_scores'], results['losses'], loss_name, score_name,
-#                 training_results_path + model_type + f"/training_results_{filename}.png")
-    
-#     mae, mape = test_fn(device, model, test_dl, forecast_len, scaler,
-#                         save_path=predictions_path + model_type + f"/predictions_{filename}")
-    
-#     best_loss = results['losses'][-1]
-#     best_train_score = results['train_scores'][-1]
-#     best_test_score = results['test_scores'][-1]
-#     with open(training_results_path + model_type + f"/training_results_{filename}.txt", "w") as file:
-#         file.write(f"Final loss ({loss_name}) value\t{best_loss}\n")
-#         file.write(f"Final train score ({score_name}) value\t{best_train_score}\n")
-#         file.write(f"Final test score ({score_name}) value\t{best_test_score}\n")
-    
-#     with open(predictions_path + model_type + f"/prediction_results_{filename}.txt", "w") as file:
-#         file.write(f"MAE score on target\t{mae}\n")
-#         file.write(f"MAPE score on target\t{mape}\n")
+    with open(predictions_path + model_type + f"/train/prediction_results_{filename}.txt", "w") as file:
+        file.write(f"MAE score on target\t{mae_train}\n")
+        file.write(f"MAPE score on target\t{mape_train}\n")
