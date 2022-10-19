@@ -7,7 +7,7 @@ The aim of the project is to investigate the use of the Transformer model (in tw
 - **Transformer Decoder**: based on the GPT-3 structure, only the decoder part of the [original architecture](https://arxiv.org/abs/1706.03762) is used, working with a self-supervised approach, the model is fed with an input time series of length L and it has to forecast the next value, giving in output a time series of length L, which has to be the input shifted to right by 1;
 - **Transformer**: in this case the whole [original architecture](https://arxiv.org/abs/1706.03762) is used with the classical approach of the transformer, the encoder is fed with a time series of length L, while the decoder is fed with a time series of lenght T which is the target shifted to left by 1. The model gives in output a time series of length T that is the target.
 
-The project has been developed as part of the course "School in AI: Deep Learning, Vision and Language for Industry".
+The project has been developed as part of the course ["School in AI: Deep Learning, Vision and Language for Industry"](https://aischools.it/).
 
 ## Dataset
 
