@@ -33,12 +33,12 @@ class YahooDataset(Dataset):
         self.scaler = scaler
         
     def __len__(self):
-        return len(self.dataset) - self.window_len - self.forecast_len
+        return len(self.dataset) - self.window_len - 2 * self.forecast_len + 1
     
     def get_scaler(self):
         return self.scaler
     
     def __getitem__(self, index):
-        input = self.dataset[index:index + self.window_len + self.forecast_len, :]
+        input = self.dataset[index:index + self.window_len + 2 * self.forecast_len - 1, :]
         input = self.scaler.transform(input)
         return torch.from_numpy(input).to(torch.float32), self.window_len, self.class_idx

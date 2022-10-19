@@ -66,10 +66,10 @@ def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, sco
             window_len = window_len[0].item()
             class_idx = class_idx[0].item()
             _, n, _ = input.shape
-            forecast_len = n - window_len
+            forecast_len = (n - window_len + 1) // 2
             src = input[:, :window_len, :]
-            trg = input[:, -forecast_len - 1:-1, :]
-            trg_y = input[:, -forecast_len:, :]
+            trg = input[:, window_len - 1:window_len - 1 + forecast_len, :]
+            trg_y = input[:, window_len:window_len + forecast_len, :]
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             optimizer.zero_grad()
             out = model(src, trg)
@@ -107,10 +107,8 @@ def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, 
         for i, (input, window_len, class_idx) in enumerate(train_dl):
             window_len = window_len[0].item()
             class_idx = class_idx[0].item()
-            _, n, _ = input.shape
-            forecast_len = n - window_len
             src = input[:, :window_len, :]
-            trg = input[:, -1:, :]
+            trg = input[:, window_len:window_len + 1, :]
             src, trg = src.to(device), trg.to(device)
             optimizer.zero_grad()
             out = model(src)

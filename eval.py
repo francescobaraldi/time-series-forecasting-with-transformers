@@ -54,10 +54,10 @@ def eval_transformer(model, dl, device, eval_name="mae", scaler=None):
             class_idx = class_idx[0].item()
             model = model.to(device)
             _, n, _ = input.shape
-            forecast_len = n - window_len
+            forecast_len = (n - window_len + 1) // 2
             src = input[:, :window_len, :]
-            trg = input[:, -forecast_len - 1:-1, :]
-            trg_y = input[:, -forecast_len:, :]
+            trg = input[:, window_len - 1:window_len - 1 + forecast_len, :]
+            trg_y = input[:, window_len:window_len + forecast_len, :]
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
             if scaler is not None:
@@ -85,10 +85,8 @@ def eval_lstm(model, dl, device, eval_name="mae", scaler=None):
             window_len = window_len[0].item()
             class_idx = class_idx[0].item()
             model = model.to(device)
-            _, n, _ = input.shape
-            forecast_len = n - window_len
             src = input[:, :window_len, :]
-            trg = input[:, -1:, :]
+            trg = input[:, window_len:window_len + 1, :]
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
