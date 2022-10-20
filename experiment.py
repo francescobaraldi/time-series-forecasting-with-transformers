@@ -35,16 +35,16 @@ models_dict = {
     },
 }
 
-model_type = "lstm"
+model_type = "transformer"
 
 if model_type == "transformer_decoder":
     
     positional_encoding = "sinusoidal"
     
-    num_epochs = 200
+    num_epochs = 20
     batch_size = 64
-    learning_rate = 1e-05
-    weight_decay = 1e-04
+    learning_rate = 0.5e-05
+    weight_decay = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -52,7 +52,7 @@ if model_type == "transformer_decoder":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate)
+                                 train_rate=train_rate, scalertype="none")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
@@ -96,10 +96,10 @@ elif model_type == "transformer":
     
     positional_encoding = "sinusoidal"
     
-    num_epochs = 200
+    num_epochs = 20
     batch_size = 64
-    learning_rate = 1e-05
-    weight_decay = 1e-04
+    learning_rate = 0.5e-05
+    weight_decay = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -107,7 +107,7 @@ elif model_type == "transformer":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate)
+                                 train_rate=train_rate, scalertype="none")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
@@ -151,10 +151,10 @@ elif model_type == "transformer":
 
 elif model_type == "lstm":
     
-    num_epochs = 800
+    num_epochs = 20
     batch_size = 64
-    learning_rate = 1e-05
-    weight_decay = 1e-04
+    learning_rate = 0.5e-05
+    weight_decay = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -162,7 +162,7 @@ elif model_type == "lstm":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate)
+                                 train_rate=train_rate, scalertype="none")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,

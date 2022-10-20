@@ -2,6 +2,16 @@ import torch
 from plot import plot_predictions
 
 
+def reconstruct(scaler, trg, out):
+    for b in range(out.shape[0]):
+        out_rec = scaler.inverse_transform(out[b, :, :])
+        trg_rec = scaler.inverse_transform(trg[b, :, :])
+        out[b, :, :] = torch.from_numpy(out_rec)
+        trg[b, :, :] = torch.from_numpy(trg_rec)
+    
+    return trg, out
+
+
 def test_transformer_decoder(device, model, dl, forecast_len, scaler, max_num=50, save_path=None):
     model = model.to(device)
     model.eval()
@@ -28,12 +38,13 @@ def test_transformer_decoder(device, model, dl, forecast_len, scaler, max_num=50
                 prediction[:, i, :] = out[:, -1, :]
                 
                 current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
-                
+            
+            if scaler is not None:
+                trg, prediction = reconstruct(scaler, trg.cpu(), prediction.cpu())
             mae += torch.mean(torch.abs(trg - prediction))
             mape += torch.mean(torch.abs((trg - prediction) / trg))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx,
-                             j, save_path)
+            plot_predictions(src[0, :, :], trg[0, :, :], prediction[0, :, :], forecast_len, class_idx, j, save_path)
         
         mae /= count
         mape /= count
@@ -71,11 +82,12 @@ def test_transformer(device, model, dl, forecast_len, scaler, max_num=50, save_p
                 current_src = input[:, src_idx:src_idx + window_len]
                 current_trg = torch.cat((current_trg[:, 1:, :], prediction[:, i, :].unsqueeze(1)), dim=1)
             
+            if scaler is not None:
+                trg_y, prediction = reconstruct(scaler, trg_y.cpu(), prediction.cpu())
             mae += torch.mean(torch.abs(trg_y - prediction))
             mape += torch.mean(torch.abs((trg_y - prediction) / trg_y))
             
-            plot_predictions(current_src[0:1, :, :].cpu(), trg_y[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
-                             save_path)
+            plot_predictions(current_src[0, :, :], trg_y[0, :, :], prediction[0, :, :], forecast_len, class_idx, j, save_path)
         
         mae /= count
         mape /= count
@@ -106,11 +118,12 @@ def test_transformer_multistep(device, model, dl, forecast_len, scaler, max_num=
             prediction = torch.zeros((batch_size, forecast_len, input_size)).to(device)
             out = model(src, trg)
             
+            if scaler is not None:
+                trg_y, prediction = reconstruct(scaler, trg_y.cpu(), prediction.cpu())
             mae += torch.mean(torch.abs(trg_y - out))
             mape += torch.mean(torch.abs((trg_y - out) / trg_y))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg_y[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
-                             save_path)
+            plot_predictions(src[0, :, :], trg_y[0, :, :], prediction[0, :, :], forecast_len, class_idx, j, save_path)
         
         mae /= count
         mape /= count
@@ -145,11 +158,12 @@ def test_lstm(device, model, dl, forecast_len, scaler, max_num=50, save_path=Non
                 
                 current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
             
+            if scaler is not None:
+                trg, prediction = reconstruct(scaler, trg.cpu(), prediction.cpu())
             mae += torch.mean(torch.abs(trg - prediction))
             mape += torch.mean(torch.abs((trg - prediction) / trg))
             
-            plot_predictions(src[0:1, :, :].cpu(), trg[0:1, :, :].cpu(), prediction[0:1, :, :].cpu(), scaler, forecast_len, class_idx, j,
-                             save_path)
+            plot_predictions(src[0, :, :], trg[0, :, :], prediction[0, :, :], forecast_len, class_idx, j, save_path)
         
         mae /= count
         mape /= count

@@ -187,7 +187,7 @@ def train_and_test_model(batch_size, learning_rate, weight_decay, num_epochs, fo
     
     optimizer = optim_cls(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     
-    model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, eval_name)
+    model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, eval_name, scaler)
     score_name = eval_name.upper()
     loss_name = str(loss_fn).lower()
     if "mse" in loss_name:
