@@ -79,7 +79,7 @@ def test_transformer(device, model, dl, forecast_len, scaler, max_num=50, save_p
             mape += torch.mean(torch.abs((trg_y - prediction) / trg_y))
             
             if scaler is not None:
-                src = reconstruct(scaler, src.cpu())
+                current_src = reconstruct(scaler, current_src.cpu())
                 trg_y = reconstruct(scaler, trg_y.cpu())
                 prediction = reconstruct(scaler, prediction.cpu())
             plot_predictions(current_src[0, :, :], trg_y[0, :, :], prediction[0, :, :], forecast_len, class_idx, j, save_path)
