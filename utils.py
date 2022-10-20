@@ -1,10 +1,9 @@
 import torch
 
-def reconstruct(scaler, trg, out):
-    for b in range(out.shape[0]):
-        out_rec = scaler.inverse_transform(out[b, :, :])
-        trg_rec = scaler.inverse_transform(trg[b, :, :])
-        out[b, :, :] = torch.from_numpy(out_rec)
-        trg[b, :, :] = torch.from_numpy(trg_rec)
+def reconstruct(scaler, input):
+    batch_size, _, _ = input.shape
+    for b in range(batch_size):
+        input_rec = scaler.inverse_transform(input[b, :, :])
+        input[b, :, :] = torch.from_numpy(input_rec)
     
-    return trg, out
+    return input

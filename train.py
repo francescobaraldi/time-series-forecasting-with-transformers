@@ -12,7 +12,7 @@ def get_filename(model_args):
     return filename
 
 
-def train_transformer_decoder(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name, scaler=None):
+def train_transformer_decoder(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
     results = {
         'train_scores': [],
         'test_scores': [],
@@ -42,8 +42,8 @@ def train_transformer_decoder(device, model, train_dl, test_dl, num_epochs, loss
         results['losses'].append(avg_loss)
         
         model.eval()
-        train_score = score_fn(model, train_dl, device, eval_name, scaler)
-        test_score = score_fn(model, test_dl, device, eval_name, scaler)
+        train_score = score_fn(model, train_dl, device, eval_name)
+        test_score = score_fn(model, test_dl, device, eval_name)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
         print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
@@ -51,7 +51,7 @@ def train_transformer_decoder(device, model, train_dl, test_dl, num_epochs, loss
     return model, results
 
 
-def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name, scaler=None):
+def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
     results = {
         'train_scores': [],
         'test_scores': [],
@@ -84,8 +84,8 @@ def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, sco
         results['losses'].append(avg_loss)
         
         model.eval()
-        train_score = score_fn(model, train_dl, device, eval_name, scaler)
-        test_score = score_fn(model, test_dl, device, eval_name, scaler)
+        train_score = score_fn(model, train_dl, device, eval_name)
+        test_score = score_fn(model, test_dl, device, eval_name)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
         print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
@@ -93,7 +93,7 @@ def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, sco
     return model, results
 
 
-def train_transformer_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name, scaler=None):
+def train_transformer_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
     results = {
         'train_scores': [],
         'test_scores': [],
@@ -126,8 +126,8 @@ def train_transformer_multistep(device, model, train_dl, test_dl, num_epochs, lo
         results['losses'].append(avg_loss)
         
         model.eval()
-        train_score = score_fn(model, train_dl, device, eval_name, scaler)
-        test_score = score_fn(model, test_dl, device, eval_name, scaler)
+        train_score = score_fn(model, train_dl, device, eval_name)
+        test_score = score_fn(model, test_dl, device, eval_name)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
         print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
@@ -135,7 +135,7 @@ def train_transformer_multistep(device, model, train_dl, test_dl, num_epochs, lo
     return model, results
 
 
-def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name, scaler=None):
+def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
     results = {
         'train_scores': [],
         'test_scores': [],
@@ -165,8 +165,8 @@ def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, 
         results['losses'].append(avg_loss)
         
         model.eval()
-        train_score = score_fn(model, train_dl, device, eval_name, scaler)
-        test_score = score_fn(model, test_dl, device, eval_name, scaler)
+        train_score = score_fn(model, train_dl, device, eval_name)
+        test_score = score_fn(model, test_dl, device, eval_name)
         results['train_scores'].append(train_score.cpu())
         results['test_scores'].append(test_score.cpu())
         print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
@@ -187,7 +187,7 @@ def train_and_test_model(batch_size, learning_rate, weight_decay, num_epochs, fo
     
     optimizer = optim_cls(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     
-    model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, eval_name, scaler)
+    model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, eval_name)
     score_name = eval_name.upper()
     loss_name = str(loss_fn).lower()
     if "mse" in loss_name:

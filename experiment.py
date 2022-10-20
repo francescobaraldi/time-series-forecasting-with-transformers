@@ -44,7 +44,7 @@ if model_type == "transformer_decoder":
     num_epochs = 20
     batch_size = 64
     learning_rate = 0.5e-05
-    weight_decay = 1e-05
+    weight_decay = 1e-06
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -66,7 +66,7 @@ if model_type == "transformer_decoder":
     num_layers = [1]
     d_models = [128]
     num_heads = [8]
-    dropouts = [0]
+    dropouts = [0.05]
     feedforward_dims = [256]
     for num_layer in num_layers:
         for d_model in d_models:
@@ -99,7 +99,7 @@ elif model_type == "transformer":
     num_epochs = 20
     batch_size = 64
     learning_rate = 0.5e-05
-    weight_decay = 1e-05
+    weight_decay = 1e-06
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -121,7 +121,7 @@ elif model_type == "transformer":
     num_layers = [1]
     d_models = [128]
     num_heads = [8]
-    dropouts = [0]
+    dropouts = [0.05]
     feedforward_dims = [256]
     for num_layer in num_layers:
         for d_model in d_models:
@@ -154,7 +154,7 @@ elif model_type == "lstm":
     num_epochs = 20
     batch_size = 64
     learning_rate = 0.5e-05
-    weight_decay = 1e-05
+    weight_decay = 1e-06
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -175,7 +175,7 @@ elif model_type == "lstm":
     
     num_layers = [2]
     hidden_dims = [64]
-    dropouts = [0]
+    dropouts = [0.05]
     for num_layer in num_layers:
         for hidden_dim in hidden_dims:
             for dropout in dropouts:

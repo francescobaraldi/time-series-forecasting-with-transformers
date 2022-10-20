@@ -1,9 +1,7 @@
-import numpy as np
 import torch
-from utils import reconstruct
 
 
-def eval_transformer_decoder(model, dl, device, eval_name="mae", scaler=None):
+def eval_transformer_decoder(model, dl, device, eval_name="mae"):
     cum_score = 0
     total = 0
     
@@ -19,8 +17,6 @@ def eval_transformer_decoder(model, dl, device, eval_name="mae", scaler=None):
             trg = input[:, 1:1 + window_len, :]
             src, trg = src.to(device), trg.to(device)
             out = model(src)
-            if scaler is not None:
-                trg, out = reconstruct(scaler, trg.cpu(), out.cpu())
             if eval_name == "mae":
                 score = torch.mean(torch.abs(out - trg))
             elif eval_name == "mape":
@@ -31,7 +27,7 @@ def eval_transformer_decoder(model, dl, device, eval_name="mae", scaler=None):
     return (cum_score / total)
 
 
-def eval_transformer(model, dl, device, eval_name="mae", scaler=None):
+def eval_transformer(model, dl, device, eval_name="mae"):
     cum_score = 0
     total = 0
     
@@ -50,8 +46,6 @@ def eval_transformer(model, dl, device, eval_name="mae", scaler=None):
             trg_y = input[:, window_len:window_len + forecast_len, :]
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
-            if scaler is not None:
-                trg_y, out = reconstruct(scaler, trg_y.cpu(), out.cpu())
             if eval_name == "mae":
                 score = torch.mean(torch.abs(out - trg_y))
             elif eval_name == "mape":
@@ -62,7 +56,7 @@ def eval_transformer(model, dl, device, eval_name="mae", scaler=None):
     return (cum_score / total)
 
 
-def eval_transformer_multistep(model, dl, device, eval_name="mae", scaler=None):
+def eval_transformer_multistep(model, dl, device, eval_name="mae"):
     cum_score = 0
     total = 0
     
@@ -81,8 +75,6 @@ def eval_transformer_multistep(model, dl, device, eval_name="mae", scaler=None):
             trg_y = input[:, -forecast_len:, :]
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
-            if scaler is not None:
-                trg_y, out = reconstruct(scaler, trg_y.cpu(), out.cpu())
             if eval_name == "mae":
                 score = torch.mean(torch.abs(out - trg_y))
             elif eval_name == "mape":
@@ -93,7 +85,7 @@ def eval_transformer_multistep(model, dl, device, eval_name="mae", scaler=None):
     return (cum_score / total)
 
 
-def eval_lstm(model, dl, device, eval_name="mae", scaler=None):
+def eval_lstm(model, dl, device, eval_name="mae"):
     cum_score = 0
     total = 0
     
@@ -109,8 +101,6 @@ def eval_lstm(model, dl, device, eval_name="mae", scaler=None):
             trg = input[:, window_len:window_len + 1, :]
             src, trg = src.to(device), trg.to(device)
             out = model(src)
-            if scaler is not None:
-                trg, out = reconstruct(scaler, trg.cpu(), out.cpu())
             if eval_name == "mae":
                 score = torch.mean(torch.abs(out - trg))
             elif eval_name == "mape":
