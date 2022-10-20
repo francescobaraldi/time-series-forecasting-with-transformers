@@ -1,15 +1,6 @@
 import numpy as np
 import torch
-
-
-def reconstruct(scaler, trg, out):
-    for b in range(out.shape[0]):
-        out_rec = scaler.inverse_transform(out[b, :, :])
-        trg_rec = scaler.inverse_transform(trg[b, :, :])
-        out[b, :, :] = torch.from_numpy(out_rec)
-        trg[b, :, :] = torch.from_numpy(trg_rec)
-    
-    return trg, out
+from utils import reconstruct
 
 
 def eval_transformer_decoder(model, dl, device, eval_name="mae", scaler=None):
@@ -29,10 +20,9 @@ def eval_transformer_decoder(model, dl, device, eval_name="mae", scaler=None):
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
-                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
-                trg, out = torch.from_numpy(trg), torch.from_numpy(out)
+                trg, out = reconstruct(scaler, trg.cpu(), out.cpu())
             if eval_name == "mae":
-                score = torch.mean(torch.abs((out - trg)))
+                score = torch.mean(torch.abs(out - trg))
             elif eval_name == "mape":
                 score = torch.mean(torch.abs((out - trg) / trg))
             cum_score += score
@@ -61,10 +51,9 @@ def eval_transformer(model, dl, device, eval_name="mae", scaler=None):
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
             if scaler is not None:
-                trg_y, out = reconstruct(scaler, trg_y.cpu().numpy(), out.cpu().numpy())
-                trg_y, out = torch.from_numpy(trg), torch.from_numpy(out)
+                trg_y, out = reconstruct(scaler, trg_y.cpu(), out.cpu())
             if eval_name == "mae":
-                score = torch.mean(torch.abs((out - trg_y)))
+                score = torch.mean(torch.abs(out - trg_y))
             elif eval_name == "mape":
                 score = torch.mean(torch.abs((out - trg_y) / trg_y))
             cum_score += score
@@ -93,10 +82,9 @@ def eval_transformer_multistep(model, dl, device, eval_name="mae", scaler=None):
             src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
             out = model(src, trg)
             if scaler is not None:
-                trg_y, out = reconstruct(scaler, trg_y.cpu().numpy(), out.cpu().numpy())
-                trg_y, out = torch.from_numpy(trg), torch.from_numpy(out)
+                trg_y, out = reconstruct(scaler, trg_y.cpu(), out.cpu())
             if eval_name == "mae":
-                score = torch.mean(torch.abs((out - trg_y)))
+                score = torch.mean(torch.abs(out - trg_y))
             elif eval_name == "mape":
                 score = torch.mean(torch.abs((out - trg_y) / trg_y))
             cum_score += score
@@ -122,10 +110,9 @@ def eval_lstm(model, dl, device, eval_name="mae", scaler=None):
             src, trg = src.to(device), trg.to(device)
             out = model(src)
             if scaler is not None:
-                trg, out = reconstruct(scaler, trg.cpu().numpy(), out.cpu().numpy())
-                trg, out = torch.from_numpy(trg), torch.from_numpy(out)
+                trg, out = reconstruct(scaler, trg.cpu(), out.cpu())
             if eval_name == "mae":
-                score = torch.mean(torch.abs((out - trg)))
+                score = torch.mean(torch.abs(out - trg))
             elif eval_name == "mape":
                 score = torch.mean(torch.abs((out - trg) / trg))
             cum_score += score
