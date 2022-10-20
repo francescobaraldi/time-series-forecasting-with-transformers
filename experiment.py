@@ -9,7 +9,7 @@ from train import train_transformer_decoder, train_transformer, train_lstm, trai
 from test import test_transformer_decoder, test_transformer, test_lstm
 
 
-yahoo_dataset_path = "datasets/yahoo_sp500.csv"
+yahoo_dataset_path = "datasets/GSPC.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
@@ -50,7 +50,7 @@ if model_type == "transformer_decoder":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.7
+    train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
                                  train_rate=train_rate)
     scaler = train_dataset.get_scaler()
@@ -105,7 +105,7 @@ elif model_type == "transformer":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.7
+    train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
                                  train_rate=train_rate)
     scaler = train_dataset.get_scaler()
@@ -160,7 +160,7 @@ elif model_type == "lstm":
     input_size = 1
     output_size = 1
     
-    train_rate = 0.7
+    train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
                                  train_rate=train_rate)
     scaler = train_dataset.get_scaler()
