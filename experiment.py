@@ -52,7 +52,7 @@ if model_type == "transformer_decoder":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate, scalertype="none")
+                                 train_rate=train_rate, scalertype="minmax")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
@@ -107,7 +107,7 @@ elif model_type == "transformer":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate, scalertype="none")
+                                 train_rate=train_rate, scalertype="minmax")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
@@ -162,7 +162,7 @@ elif model_type == "lstm":
     
     train_rate = 0.8
     train_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=True,
-                                 train_rate=train_rate, scalertype="none")
+                                 train_rate=train_rate, scalertype="minmax")
     scaler = train_dataset.get_scaler()
     joblib.dump(scaler, f"{weights_path}scaler_split_{int(train_rate*100)}.gz")
     test_dataset = YahooDataset(dataset_path=yahoo_dataset_path, window_len=window_len, forecast_len=forecast_len, train=False,
