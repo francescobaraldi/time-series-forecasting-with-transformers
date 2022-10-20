@@ -44,6 +44,7 @@ if model_type == "transformer_decoder":
     num_epochs = 200
     batch_size = 64
     learning_rate = 1e-05
+    weight_decay = 1e-04
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -83,10 +84,10 @@ if model_type == "transformer_decoder":
                             'dropout': dropout,
                             'positional_encoding': positional_encoding,
                         }
-                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                             forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                             model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
-                                             train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, weight_decay=weight_decay,
+                                             num_epochs=num_epochs, forecast_len=forecast_len, train_dataset=train_dataset,
+                                             test_dataset=test_dataset, model_cls=model_dict['model_cls'], loss_fn=loss_fn,
+                                             optim_cls=optim_cls, train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
                                              eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
                                              predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
                                              eval_name=eval_name, model_args=model_args)
@@ -98,6 +99,7 @@ elif model_type == "transformer":
     num_epochs = 200
     batch_size = 64
     learning_rate = 1e-05
+    weight_decay = 1e-04
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -139,10 +141,10 @@ elif model_type == "transformer":
                             'dropout': dropout,
                             'positional_encoding': positional_encoding,
                         }
-                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                             forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                             model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
-                                             train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                        train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, weight_decay=weight_decay,
+                                             num_epochs=num_epochs, forecast_len=forecast_len, train_dataset=train_dataset,
+                                             test_dataset=test_dataset, model_cls=model_dict['model_cls'], loss_fn=loss_fn,
+                                             optim_cls=optim_cls, train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
                                              eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
                                              predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
                                              eval_name=eval_name, model_args=model_args)
@@ -152,6 +154,7 @@ elif model_type == "lstm":
     num_epochs = 800
     batch_size = 64
     learning_rate = 1e-05
+    weight_decay = 1e-04
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -183,10 +186,10 @@ elif model_type == "lstm":
                     'num_layers': num_layer,
                     'dropout': dropout
                 }
-                train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, num_epochs=num_epochs,
-                                     forecast_len=forecast_len, train_dataset=train_dataset, test_dataset=test_dataset,
-                                     model_cls=model_dict['model_cls'], loss_fn=loss_fn, optim_cls=optim_cls,
-                                     train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
+                train_and_test_model(batch_size=batch_size, learning_rate=learning_rate, weight_decay=weight_decay,
+                                     num_epochs=num_epochs, forecast_len=forecast_len, train_dataset=train_dataset,
+                                     test_dataset=test_dataset, model_cls=model_dict['model_cls'], loss_fn=loss_fn,
+                                     optim_cls=optim_cls, train_fn=model_dict['train_fn'], test_fn=model_dict['test_fn'],
                                      eval_fn=model_dict['eval_fn'], training_results_path=training_results_path,
                                      predictions_path=predictions_path, weights_path=weights_path, model_type=model_type,
                                      eval_name=eval_name, model_args=model_args)

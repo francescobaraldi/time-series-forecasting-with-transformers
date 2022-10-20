@@ -132,9 +132,9 @@ def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, 
     return model, results
 
 
-def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, train_dataset, test_dataset, model_cls, loss_fn,
-                         optim_cls, train_fn, test_fn, eval_fn, training_results_path, predictions_path, weights_path, model_type,
-                         eval_name, model_args):
+def train_and_test_model(batch_size, learning_rate, weight_decay, num_epochs, forecast_len, train_dataset, test_dataset, model_cls,
+                         loss_fn, optim_cls, train_fn, test_fn, eval_fn, training_results_path, predictions_path, weights_path,
+                         model_type, eval_name, model_args):
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     scaler = train_dataset.get_scaler()
@@ -143,7 +143,7 @@ def train_and_test_model(batch_size, learning_rate, num_epochs, forecast_len, tr
     
     model = model_cls(**model_args).to(device)
     
-    optimizer = optim_cls(model.parameters(), lr=learning_rate)
+    optimizer = optim_cls(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     
     model, results = train_fn(device, model, train_dl, test_dl, num_epochs, loss_fn, eval_fn, optimizer, eval_name)
     score_name = eval_name.upper()
