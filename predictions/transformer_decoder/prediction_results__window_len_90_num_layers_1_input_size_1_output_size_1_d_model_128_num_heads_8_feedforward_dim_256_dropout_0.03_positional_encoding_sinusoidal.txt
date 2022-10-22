@@ -1,0 +1,2 @@
+MAE score on target	0.05773225799202919
+MAPE score on target	0.05681199952960014
