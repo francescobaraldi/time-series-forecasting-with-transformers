@@ -29,19 +29,16 @@ def plot_scores(train_scores, test_scores, losses, loss_name="", score_name="", 
         plt.savefig(save_path)
 
 
-def plot_predictions(src, trg, predictions, scaler, forecast_len, class_idx, i, save_path=None):
-    _, window_len, _ = src.shape
-    src_rec = scaler.inverse_transform(src[0, :, :])
-    trg_rec = scaler.inverse_transform(trg[0, :, :])
-    predictions_rec = scaler.inverse_transform(predictions[0, :, :])
-    src_rec = src_rec[:, class_idx].tolist()
-    trg_rec = trg_rec[:, class_idx].tolist()
-    predictions_rec = predictions_rec[:, class_idx].tolist()
+def plot_predictions(src, trg, predictions, forecast_len, class_idx, i, save_path=None):
+    window_len, _ = src.shape
+    src = src[:, class_idx].tolist()
+    trg = trg[:, class_idx].tolist()
+    predictions = predictions[:, class_idx].tolist()
     
     plt.figure(figsize=(15,6))
-    plt.plot(np.arange(1, window_len + 1), src_rec, '-', color='green', label='Source', linewidth=1)
-    plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), trg_rec, '-', color='blue', label='Target', linewidth=1)
-    plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), predictions_rec, '--', color='red', label='Prediction', linewidth=1)
+    plt.plot(np.arange(1, window_len + 1), src, '-', color='green', label='Source', linewidth=1)
+    plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), trg, '-', color='blue', label='Target', linewidth=1)
+    plt.plot(np.arange(1 + window_len, 1 + window_len + forecast_len), predictions, '--', color='red', label='Prediction', linewidth=1)
     plt.xlabel("Days")
     plt.ylabel("Closing price ($)")
     handles, labels = plt.gca().get_legend_handles_labels()
