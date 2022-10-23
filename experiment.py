@@ -9,7 +9,7 @@ from train import train_transformer_decoder, train_transformer, train_lstm, trai
 from test import test_transformer_decoder, test_transformer, test_lstm, test_transformer_multistep
 
 
-yahoo_dataset_path = "datasets/GSPC.csv"
+yahoo_dataset_path = "datasets/sp500.csv"
 predictions_path = "predictions/"
 training_results_path = "training_results/"
 weights_path = "weights/"
