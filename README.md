@@ -21,39 +21,42 @@ For each model:
 
 - batch size = 64;
 - input time series length = 90;
-- trainset split = 70%
-- testset split = 30%
+- trainset split = 80%
+- testset split = 20%
 - loss function = Mean Squared Error
 - optimizer = Adam
 
 ### Transformer decoder best values
 
-- learning rate = 1e-05
+- learning rate = 5e-06
+- weight decay = 1e-06
 - number of decoders = 1
 - dimension of the model (feature size) = 128
 - number of heads = 8
-- dropout = 0
+- dropout = 0.03
 - dimension of the fully connected inside the decoder = 256
 - positional encoding = classical sinusoidal encoding
 
 ### Transformer best values
 
 - output time series length = 30
-- learning rate = 1e-05
+- learning rate = 5e-06
+- weight decay = 1e-06
 - number of encoders = 1
 - number of decoders = 1
 - dimension of the model (feature size) = 128
 - number of heads = 8
-- dropout = 0
+- dropout = 0.08
 - dimension of the fully connected inside the decoder = 256
-- positional encoding = classical sinusoidal encoding
+- positional encoding = learnable encoding
 
 ### LSTM best values
 
 - learning rate = 1e-05
+- weight decay = 1e-05
 - number of layers = 2
 - dimension of the hidden states = 64
-- dropout = 0
+- dropout = 0.05
 
 After the training each model is tested on the test set with a forecast length of 30 days and the forecast is plotted against the ground truth and saved to file.
 To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Percentage Error* is measured.
@@ -64,9 +67,9 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 
 |                   | Transformer Decoder | Transformer | LSTM    |
 |:-----------------:|:-------------------:|:-----------:|:-------:|
-| loss value (MSE)  | 0.00010             | 0.00012     | 0.00217 |
-| train score (MAE) | 0.00712             | 0.00768     | 0.03323 |
-| test score (MAE)  | 0.08099             | **0.07480** | 0.27325 |
+| loss value (MSE)  | 0.00419             | 0.00689     | 0.00021 |
+| train score (MAE) | 0.00859             | 0.03237     | 0.00860 |
+| test score (MAE)  | 0.03317             | 0.04728     | 0.14154 |
 
 *Transformer decoder training*:
 ![alt text](images/training_transformer_decoder.png "Transformer decoder training")
@@ -81,13 +84,22 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 
 |            | Transformer Decoder | Transformer | LSTM    |
 |:----------:|:-------------------:|:-----------:|:-------:|
-| MAE score  | 0.34848             | **0.07524** | 0.49090 |
-| MAPE score | 0.15952             | **0.03263** | 0.31760 |
+| MAE score  | 0.05773             | 0.05506     | 0.16314 |
+| MAPE score | 0.05681             | 0.06527     | 0.12568 |
 
-The results show that the Transformer model is the best one, it performs an order of magnitude better with respect to others.
+The results show that both the Transformer Decoder and the Transformer model reach very similar performance, they perform an order of magnitude better with respect to the LSTM model.
+
+Some examples of Transformer Decoder forecasting from the test set:
+![alt text](images/prediction_transformer_decoder_1.png "Transformer forecast example")
+![alt text](images/prediction_transformer_decoder_2.png "Transformer forecast example")
+
 Some examples of Transformer forecasting from the test set:
 ![alt text](images/prediction_transformer_1.png "Transformer forecast example")
 ![alt text](images/prediction_transformer_2.png "Transformer forecast example")
+
+Some examples of LSTM forecasting from the test set:
+![alt text](images/prediction_lstm_1.png "Transformer forecast example")
+![alt text](images/prediction_lstm_2.png "Transformer forecast example")
 
 ## Usage
 
