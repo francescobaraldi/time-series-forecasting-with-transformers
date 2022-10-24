@@ -1,5 +1,6 @@
 import torch
 from plot import plot_inference
+from utils import reconstruct
 
 
 def inference_transformer_decoder(device, model, src, forecast_len, scaler, save_path=None):
@@ -15,8 +16,10 @@ def inference_transformer_decoder(device, model, src, forecast_len, scaler, save
             out = model(current_src)
             prediction[i, :] = out[0, -1, :]
             current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
-            
-        plot_inference(src[0, :, :].cpu(), prediction.cpu(), scaler, forecast_len, 0, save_path)
+        
+        src = reconstruct(scaler, src.cpu())
+        prediction = reconstruct(scaler, prediction.unsqueeze(0).cpu())
+        plot_inference(src[0, :, :].cpu(), prediction[0, :, :].cpu(), forecast_len, 0, save_path)
 
 
 def inference_transformer(device, model, input, window_len, forecast_len, scaler, save_path=None):
@@ -37,8 +40,10 @@ def inference_transformer(device, model, input, window_len, forecast_len, scaler
             src_idx = i + 1
             current_src = input[:, src_idx:src_idx + window_len]
             current_trg = torch.cat((current_trg[0:1, 1:, :], prediction[i, :].unsqueeze(0).unsqueeze(0)), dim=1)
-            
-        plot_inference(src[0, :, :].cpu(), prediction.cpu(), scaler, forecast_len, 0, save_path)
+        
+        current_src = reconstruct(scaler, current_src.cpu())
+        prediction = reconstruct(scaler, prediction.unsqueeze(0).cpu())
+        plot_inference(current_src[0, :, :].cpu(), prediction[0, :, :].cpu(), forecast_len, 0, save_path)
 
 
 def inference_lstm(device, model, src, forecast_len, scaler, save_path=None):
@@ -55,4 +60,6 @@ def inference_lstm(device, model, src, forecast_len, scaler, save_path=None):
             prediction[i, :] = out[0, -1, :]
             current_src = torch.cat((current_src[:, 1:, :], out[:, -1:, :]), dim=1)
             
-        plot_inference(src[0, :, :].cpu(), prediction.cpu(), scaler, forecast_len, 0, save_path)
+        src = reconstruct(scaler, src.cpu())
+        prediction = reconstruct(scaler, prediction.unsqueeze(0).cpu())
+        plot_inference(src[0, :, :].cpu(), prediction[0, :, :].cpu(), forecast_len, 0, save_path)

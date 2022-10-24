@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 import joblib
 import yfinance as yf
@@ -9,7 +8,7 @@ from inference import inference_transformer_decoder, inference_transformer, infe
 
 def main():
     best_model_path = "best_models/"
-    scaler_path = "weights/scaler_split_70.gz"
+    scaler_path = "weights/scaler_split_80.gz"
     inference_path = "inference_results/"
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -56,11 +55,12 @@ def main():
     lstm.load_state_dict(torch.load(best_model_path + "best_lstm.pth", map_location=torch.device(device)))
     
     scaler = joblib.load(scaler_path)
+    gspc = yf.Ticker("^GSPC")
+    gspc = gspc.history(period="1y")
     
-    print("Forecasting the SP500 index closing price for the next 30 days with transformer decoder model...")
+    print("\nForecasting the SP500 index closing price for the next 30 days with transformer decoder model...")
     
-    data = yf.download('SPY').iloc[-window_len:]
-    data = data[['Close']].to_numpy()
+    data = gspc[['Close']].iloc[-window_len:].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
     src = torch.from_numpy(data_scaled).float().unsqueeze(0)
@@ -70,11 +70,10 @@ def main():
     print(f"The prediction of the transformer decoder model has been saved correctly in folder {inference_path}")
     
     
-    print("Forecasting the SP500 index closing price for the next 30 days with transformer model...")
+    print("\nForecasting the SP500 index closing price for the next 30 days with transformer model...")
     
     n = window_len + forecast_len - 1
-    data = yf.download('SPY').iloc[-n:]
-    data = data[['Close']].to_numpy()
+    data = gspc[['Close']].iloc[-n:].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
     input = torch.from_numpy(data_scaled).float().unsqueeze(0)
@@ -84,10 +83,9 @@ def main():
     print(f"The prediction of the transformer model has been saved correctly in folder {inference_path}")
     
     
-    print("Forecasting the SP500 index closing price for the next 30 days with lstm model...")
+    print("\nForecasting the SP500 index closing price for the next 30 days with lstm model...")
     
-    data = yf.download('SPY').iloc[-window_len:]
-    data = data[['Close']].to_numpy()
+    data = gspc[['Close']].iloc[-window_len:].to_numpy()
     scaler = joblib.load(scaler_path)
     data_scaled = scaler.transform(data)
     src = torch.from_numpy(data_scaled).float().unsqueeze(0)
