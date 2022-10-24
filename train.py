@@ -93,48 +93,6 @@ def train_transformer(device, model, train_dl, test_dl, num_epochs, loss_fn, sco
     return model, results
 
 
-def train_transformer_multistep(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
-    results = {
-        'train_scores': [],
-        'test_scores': [],
-        'losses': [],
-    }
-    model = model.to(device)
-    for e in tqdm(range(num_epochs)):        
-        model.train()
-        avg_loss = 0
-        count = 0
-        for i, (input, window_len, class_idx) in enumerate(train_dl):
-            window_len = window_len[0].item()
-            class_idx = class_idx[0].item()
-            _, n, _ = input.shape
-            forecast_len = (n - window_len + 1) // 2
-            src = input[:, :window_len, :]
-            trg = input[:, window_len - 1:window_len - 1 + forecast_len, :]
-            trg_y = input[:, -forecast_len:, :]
-            src, trg, trg_y = src.to(device), trg.to(device), trg_y.to(device)
-            optimizer.zero_grad()
-            out = model(src, trg)
-            loss = loss_fn(out, trg_y)
-            avg_loss += loss.cpu().detach().numpy().item()
-            if i % 50 == 0:
-                print(f'\nloss {loss.cpu().item():.6f}')
-            loss.backward()
-            optimizer.step()
-            count += 1
-        avg_loss /= count
-        results['losses'].append(avg_loss)
-        
-        model.eval()
-        train_score = score_fn(model, train_dl, device, eval_name)
-        test_score = score_fn(model, test_dl, device, eval_name)
-        results['train_scores'].append(train_score.cpu())
-        results['test_scores'].append(test_score.cpu())
-        print(f"\nEpoch {e + 1} - Train score {train_score} - Test score {test_score}")
-    
-    return model, results
-
-
 def train_lstm(device, model, train_dl, test_dl, num_epochs, loss_fn, score_fn, optimizer, eval_name):
     results = {
         'train_scores': [],
@@ -205,8 +163,8 @@ def train_and_test_model(batch_size, learning_rate, weight_decay, num_epochs, fo
     
     mae, mape = test_fn(device, model, test_dl, forecast_len, scaler,
                         save_path=predictions_path + model_type + f"/predictions_{filename}")
-    mae_train, mape_train = test_fn(device, model, train_dl, forecast_len, scaler,
-                                    save_path=predictions_path + model_type + f"/train/predictions_{filename}")
+    # mae_train, mape_train = test_fn(device, model, train_dl, forecast_len, scaler,
+    #                                 save_path=predictions_path + model_type + f"/train/predictions_{filename}")
     
     final_loss = results['losses'][-1]
     final_train_score = results['train_scores'][-1]
@@ -219,6 +177,6 @@ def train_and_test_model(batch_size, learning_rate, weight_decay, num_epochs, fo
     with open(predictions_path + model_type + f"/prediction_results_{filename}.txt", "w") as file:
         file.write(f"MAE score on target\t{mae}\n")
         file.write(f"MAPE score on target\t{mape}\n")
-    with open(predictions_path + model_type + f"/train/prediction_results_{filename}.txt", "w") as file:
-        file.write(f"MAE score on target\t{mae_train}\n")
-        file.write(f"MAPE score on target\t{mape_train}\n")
+    # with open(predictions_path + model_type + f"/train/prediction_results_{filename}.txt", "w") as file:
+    #     file.write(f"MAE score on target\t{mae_train}\n")
+    #     file.write(f"MAPE score on target\t{mape_train}\n")
