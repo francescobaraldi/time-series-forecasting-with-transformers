@@ -16,7 +16,7 @@ To normalize the data the min max scaling is used, fitted on the train set and t
 
 ## Training
 
-The training is performed in the ```experiment.py``` file, for each model hyperparameter optimization is performed and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
+The training is performed in the `experiment.py` file, for each model hyperparameter optimization is performed and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
 For each model:
 
 - batch size = 64;
@@ -107,17 +107,20 @@ As the plots show, the models are able to approximate quite well the general evo
 
 Clone the repository:
 
-```git clone https://github.com/francescobaraldi/time-series-forecasting-with-transformers.git
+```bash
+git clone https://github.com/francescobaraldi/time-series-forecasting-with-transformers.git
 ```
 
 Install the dependencies:
 
-```pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
 Then it is possible to execute the main file which runs the three models tested in order to forecast the next 30 days closing price of the S&P 500 index:
 
-```python main.py
+```bash
+python main.py
 ```
 
 The results will be plotted and saved in the directory `inference_results/` in png format, one image for each model tested.
