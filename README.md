@@ -106,17 +106,25 @@ As the plots show, the models are able to approximate quite well the general evo
 ## Usage
 
 Clone the repository:
-```git clone https://github.com/francescobaraldi/time-series-forecasting-with-transformers.git```
+
+```git clone https://github.com/francescobaraldi/time-series-forecasting-with-transformers.git
+```
 
 Install the dependencies:
-```pip install -r requirements.txt```
+
+```pip install -r requirements.txt
+```
 
 Then it is possible to execute the main file which runs the three models tested in order to forecast the next 30 days closing price of the S&P 500 index:
-```python main.py```
-The results will be plotted and saved in the directory ```inference_results/``` in png format, one image for each model tested.
 
-It is also possible to experiment with the models, in the ```experiment.py``` file there is the code to train the models and it's possible to try with different hyper parameters, different lengths of the input time series and output time series. The notebook version of the file allows to run the code in [Google Colab](https://colab.research.google.com/).
+```python main.py
+```
+
+The results will be plotted and saved in the directory `inference_results/` in png format, one image for each model tested.
+
+It is also possible to experiment with the models, in the `experiment.py` file there is the code to train the models and it's possible to try with different hyper parameters, different lengths of the input time series and output time series. The notebook version of the file allows to run the code in [Google Colab](https://colab.research.google.com/).
 
 ## References
 
 - [Attention Is All You Need - Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin](https://arxiv.org/abs/1706.03762)
+- [Kaggle dataset used](https://www.kaggle.com/datasets/benjibb/sp500-since-1950)
