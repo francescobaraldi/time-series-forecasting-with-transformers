@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The aim of the project is to investigate the use of the Transformer model (in two versions) in financial time series forecasting and evaluate its performance against a classical recurrent neural network, in particulat the LSTM model. Two versions of the Transformer are used with two different approaches for the forecasting:
+The aim of the project is to investigate the use of the Transformer model (in two versions) in financial time series forecasting and evaluate its performance against a classical recurrent neural network, in particular the LSTM model. Two versions of the Transformer are used with two different approaches for the forecasting:
 
 - **Transformer Decoder**: based on the GPT-3 structure, only the decoder part of the [original architecture](https://arxiv.org/abs/1706.03762) is used, working with a self-supervised approach, the model is fed with an input time series of length L and it has to forecast the next value, giving in output a time series of length L, which has to be the input shifted to right by 1;
 - **Transformer**: in this case the whole [original architecture](https://arxiv.org/abs/1706.03762) is used with the classical approach of the transformer, the encoder is fed with a time series of length L, while the decoder is fed with a time series of lenght T which is the target shifted to left by 1. The model gives in output a time series of length T that is the target.
@@ -11,12 +11,12 @@ The project has been developed as part of the course ["School in AI: Deep Learni
 
 ## Dataset
 
-The dataset used is taken from Yahoo Finance and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 29-01-1993 to 06-10-2022. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
+The dataset used is taken from [Kaggle](https://www.kaggle.com/datasets/benjibb/sp500-since-1950) and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 03-01-1950 to 06-06-2018. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
 To normalize the data the min max scaling is used, fitted on the train set and then applied also to the test set. The evaluation metrics then are computed on the scaled data, while in order to plot the forecasting with the correct values an inverse scaling is  applied before plotting.
 
 ## Training
 
-The training is performed in the ```experiment.py``` file, for each model hyperparameter optimization is performed and during the run the results are saved in the respective directories. The optimal hyperparamters are listed below.
+The training is performed in the ```experiment.py``` file, for each model hyperparameter optimization is performed and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
 For each model:
 
 - batch size = 64;
@@ -35,7 +35,7 @@ For each model:
 - number of heads = 8
 - dropout = 0.03
 - dimension of the fully connected inside the decoder = 256
-- positional encoding = classical sinusoidal encoding
+- positional encoding = classical sinusoidal positional encoding
 
 ### Transformer best values
 
@@ -48,7 +48,7 @@ For each model:
 - number of heads = 8
 - dropout = 0.08
 - dimension of the fully connected inside the decoder = 256
-- positional encoding = learnable encoding
+- positional encoding = learnable positional encoding
 
 ### LSTM best values
 
@@ -100,6 +100,8 @@ Some examples of Transformer forecasting from the test set:
 Some examples of LSTM forecasting from the test set:
 ![alt text](images/prediction_lstm_1.png "Transformer forecast example")
 ![alt text](images/prediction_lstm_2.png "Transformer forecast example")
+
+As the plots show, the models are able to approximate quite well the general evolution of the forecast window, while the small variations are not modeled very well.
 
 ## Usage
 
