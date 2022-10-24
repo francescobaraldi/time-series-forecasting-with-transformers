@@ -94,7 +94,7 @@ if model_type == "transformer_decoder":
 
 elif model_type == "transformer":
     
-    positional_encoding = "sinusoidal"
+    positional_encoding = "learnable"
     
     num_epochs = 20
     batch_size = 64
@@ -153,8 +153,8 @@ elif model_type == "lstm":
     
     num_epochs = 20
     batch_size = 64
-    learning_rate = 0.5e-05
-    weight_decay = 1e-06
+    learning_rate = 1e-05
+    weight_decay = 1e-05
     window_len = 90
     forecast_len = 30
     input_size = 1
@@ -173,8 +173,8 @@ elif model_type == "lstm":
     eval_name = "mae"
     model_dict = models_dict[model_type]
     
-    num_layers = [1]
-    hidden_dims = [128]
+    num_layers = [2]
+    hidden_dims = [64]
     dropouts = [0.05]
     for num_layer in num_layers:
         for hidden_dim in hidden_dims:
