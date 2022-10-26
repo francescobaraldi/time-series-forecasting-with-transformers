@@ -117,6 +117,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/francescobaraldi/time-series-forecasting-with-transformers.git
+cd time-series-forecasting-with-transformers
 ```
 
 Install the dependencies:
@@ -125,7 +126,7 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
-Then it is possible to execute the main file which runs the three models tested in order to forecast the next 30 days closing price of the S&P 500 index:
+Then it is possible to execute the main file which runs the three models in order to forecast the closing price of the next 30 days of the S&P 500 index:
 
 ```bash
 python main.py
