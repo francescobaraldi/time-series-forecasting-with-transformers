@@ -18,7 +18,7 @@ To normalize the data the min max scaling is used, fitted on the training set an
 
 The training is performed in the `experiment.py` file, dropout and L2 regularization is applied in order to avoid overfitting, so the *dropout* parameter of the models is set with a specific value, and the L2 regularization is applied setting the *weight_decay* parameter of the Adam optimizer. For each model is performed an hyperparameter optimization and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
 
-For each model:
+### For each model
 
 - batch size = 64;
 - input time series length = 90;
@@ -88,7 +88,7 @@ The following table shows the results of the training phase, it's important to n
 
 ### Testing results
 
-The following table shows the results of the testing phase, here the metrics's scores are computed on the forecasting of the next 30 days in the future, following the process descrbied [here](#testing).
+The following table shows the results of the testing phase, here the metrics' scores are computed on the forecasting of the next 30 days in the future, following the process descrbied in the [Testing section](#testing).
 
 |            | Transformer Decoder | Transformer | LSTM    |
 |:----------:|:-------------------:|:-----------:|:-------:|
