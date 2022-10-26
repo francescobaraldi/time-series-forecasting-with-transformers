@@ -12,17 +12,18 @@ The project has been developed as part of the course ["School in AI: Deep Learni
 ## Dataset
 
 The dataset used is taken from [Kaggle](https://www.kaggle.com/datasets/benjibb/sp500-since-1950) and it contains the *Open*, *High*, *Low*, *Close*, *Adj Close* and *Volume* values of S&P 500 index for each days from 03-01-1950 to 06-06-2018. For the goal of this project only the *Close* feature is used in order to obtain **univariate time series**.
-To normalize the data the min max scaling is used, fitted on the train set and then applied also to the test set. The evaluation metrics then are computed on the scaled data, while in order to plot the forecasting with the correct values an inverse scaling is  applied before plotting.
+To normalize the data the min max scaling is used, fitted on the training set and then applied also to the test set. The evaluation metrics then are computed on the scaled data, while in order to plot the forecasting with the correct values an inverse scaling is  applied before plotting.
 
 ## Training
 
-The training is performed in the `experiment.py` file, for each model hyperparameter optimization is performed and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
+The training is performed in the `experiment.py` file, dropout and L2 regularization is applied in order to avoid overfitting, so the *dropout* parameter of the models is set with a specific value, and the L2 regularization is applied setting the *weight_decay* parameter of the Adam optimizer. For each model is performed an hyperparameter optimization and during the run the results are saved in the respective directories. The optimal hyperparamters obtained are listed below.
+
 For each model:
 
 - batch size = 64;
 - input time series length = 90;
-- trainset split = 80%
-- testset split = 20%
+- training set split = 80%
+- test set split = 20%
 - loss function = Mean Squared Error
 - optimizer = Adam
 
@@ -58,12 +59,17 @@ For each model:
 - dimension of the hidden states = 64
 - dropout = 0.05
 
-After the training each model is tested on the test set with a forecast length of 30 days and the forecast is plotted against the ground truth and saved to file.
-To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Percentage Error* is measured.
+## Testing
+
+Since the models are trained to forecast the single next value of the time series given in input, the process of forecasting N future steps is composed by N steps: the model forecast the single next value, that is considered correct and then it's appended to the original input, which is fed to the model. By iterating this process N times we will obtain N future values.
+After the training phase, each model is tested on the test set in the way explained so far, with a forecast length of 30 days and the forecast is plotted against the ground truth and saved to file.
+To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Percentage Error* is measured on this 30 days window.
 
 ## Results
 
 ### Training results
+
+The following table shows the results of the training phase, it's important to notice that here the metrics' scores are based on the forecasting of the single next value of the time series and not on the forecasting of N future steps.
 
 |                   | Transformer Decoder | Transformer | LSTM    |
 |:-----------------:|:-------------------:|:-----------:|:-------:|
@@ -82,12 +88,14 @@ To evaluate the performance the *Mean Absolute Error* and the *Mean Absolute Per
 
 ### Testing results
 
+The following table shows the results of the testing phase, here the metrics's scores are computed on the forecasting of the next 30 days in the future, following the process descrbied [here](#testing).
+
 |            | Transformer Decoder | Transformer | LSTM    |
 |:----------:|:-------------------:|:-----------:|:-------:|
 | MAE score  | 0.05773             | 0.05506     | 0.16314 |
 | MAPE score | 0.05681             | 0.06527     | 0.12568 |
 
-The results show that both the Transformer Decoder and the Transformer model reach very similar performance, they perform an order of magnitude better with respect to the LSTM model.
+The results show that both the Transformer Decoder and the Transformer models reach very similar performance, they perform an order of magnitude better with respect to the LSTM model.
 
 Some examples of Transformer Decoder forecasting from the test set:
 ![alt text](images/prediction_transformer_decoder_1.png "Transformer forecast example")
